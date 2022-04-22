@@ -8,8 +8,12 @@ import (
 func TestDump(t *testing.T) {
 
 	tt := []string{
+		"x?",
+		"x{3,4}",
+		"xxxx?",
 		"[c-f]",
 		"[^c-f]",
+		"[[:alpha:]]",
 		"abcdefg",
 		"^abcdefg",
 		"abcdefg$",

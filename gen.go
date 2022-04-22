@@ -43,7 +43,8 @@ func dump(b *strings.Builder, re *syntax.Regexp) {
 	}
 }
 
-// freedom degree of current node.
+// freedom degree of current tree
+// TODO - completer/verifier !!
 func freedom(re *syntax.Regexp) int64 {
 
 	if re == nil {
@@ -53,6 +54,20 @@ func freedom(re *syntax.Regexp) int64 {
 
 	case syntax.OpAlternate:
 		return int64(len(re.Sub))
+	case syntax.OpQuest:
+		return 2 * freedom(re.Sub[0])
+	case syntax.OpCapture:
+		f := int64(1)
+		for _, rr := range re.Sub {
+			f *= freedom(rr)
+		}
+		return f
+	case syntax.OpConcat:
+		f := int64(1)
+		for _, rr := range re.Sub {
+			f *= freedom(rr)
+		}
+		return f
 	case syntax.OpCharClass:
 		var f int64
 		for i := 0; i+1 < len(re.Rune); i += 2 {
