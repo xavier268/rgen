@@ -2,9 +2,57 @@ package revregex
 
 import (
 	"fmt"
+	"math/big"
+	"math/rand"
 	"regexp/syntax"
 	"strings"
+	"time"
 )
+
+// Gen can efficiently and deterministically generate strings that match a given regexp.
+type Gen struct {
+	// source string for the regexp.
+	source string
+	// root parsed tree
+	tree *syntax.Regexp
+	// random generator.
+	rand *rand.Rand
+	// max length when generating with * or + metasymbols. Has no impact on the actual length of the generated strings.
+	// set to 0 to disable * and +
+	// set to a negative value to have no formal limit, but an exponential law.
+	ml int
+}
+
+// New creates a new generator.
+// It will panic if the regexp provided is not syntacly correct.
+// Use POSIX syntax.
+func New(source string) *Gen {
+	var err error
+	g := new(Gen)
+	g.source = source
+	g.tree, err = syntax.Parse(source, syntax.POSIX)
+	if err != nil {
+		panic(err)
+	}
+	g.tree = g.tree.Simplify()
+	g.rand = rand.New(rand.NewSource(time.Hour.Milliseconds()))
+	g.ml = 6 // see if we want to keep this default value ?
+	return g
+}
+
+// Next provides a random string matching the regexp.
+func (g *Gen) Next() string {
+	panic("to do")
+}
+
+// NextI provides a determistic string matching the regexp.
+// i should be strictly positive.
+// The bigint returned it garanteed to be smaller or equal to the initial i value.
+func (g *Gen) NextI(i *big.Int) (string, *big.Int, error) {
+
+}
+
+var ErrEntropyExhausted = fmt.Errorf("unsufficient entropy available")
 
 func Dump(s string) {
 
