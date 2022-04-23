@@ -49,7 +49,7 @@ func (g *Gen) Next() string {
 // i should be strictly positive.
 // The bigint returned it garanteed to be smaller or equal to the initial i value.
 func (g *Gen) NextI(i *big.Int) (string, *big.Int, error) {
-
+	panic("to do")
 }
 
 var ErrEntropyExhausted = fmt.Errorf("unsufficient entropy available")
