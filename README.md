@@ -68,7 +68,7 @@ type Chooser interface {
 
 ```
 
-Two ways to construct an Inter are provided :
+Two ways to construct a Chooser are provided :
 
 * **NewRandChooser** to make decision randomly. If you computer has a good random generator, you most likely will endup generating all the shorter possible strings.
 
