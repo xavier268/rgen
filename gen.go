@@ -16,12 +16,16 @@ type Gen struct {
 	tree *syntax.Regexp
 }
 
-// ShouldSimply is a global flag to decide if we should simplify or not when parsing a new expression.
-var ShouldSimplify = true
+// Same as NewGen, but in addition, the tree is simplified.
+func NewGenSimpl(source string) *Gen {
+	g := NewGen(source)
+	g.tree = g.tree.Simplify()
+	return g
+}
 
 // NewGen creates a new generator.
 // It will panic if the regexp provided is not syntacly correct.
-// Use POSIX syntax.
+// Use POSIX syntax. No tree simplification.
 func NewGen(source string) *Gen {
 	var err error
 	g := new(Gen)
@@ -29,9 +33,6 @@ func NewGen(source string) *Gen {
 	g.tree, err = syntax.Parse(source, syntax.POSIX)
 	if err != nil {
 		panic(err)
-	}
-	if ShouldSimplify {
-		g.tree = g.tree.Simplify()
 	}
 	return g
 }
@@ -57,6 +58,13 @@ func toString(b *strings.Builder, re *syntax.Regexp) {
 	case
 		syntax.OpLiteral, syntax.OpCharClass:
 		fmt.Fprintf(b, "%s(%q)", re.Op, re.Rune)
+
+	case syntax.OpRepeat:
+		fmt.Fprintf(b, "%s{%d,%d}(", re.Op, re.Min, re.Max)
+		for _, rs := range re.Sub {
+			toString(b, rs)
+		}
+		fmt.Fprint(b, ")")
 
 	default:
 

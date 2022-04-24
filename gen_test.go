@@ -23,20 +23,24 @@ func TestGenStringVisual(t *testing.T) {
 		"a|b|c",
 		"a|",
 		"(a|)",
+		"a{2,8}",
 		"a(tv)+f*|6+xx[a-f]z",
+		"(((abc)))",
 	}
 
 	for i, rs := range tt {
 		// Display tree
-		fmt.Print(i, "\t")
-		g := NewGen(rs)
-		fmt.Println(g)
+		fmt.Print(i, " raw  \t")
+		fmt.Println(NewGen(rs))
+		fmt.Print(i, " simpl\t")
+		fmt.Println(NewGenSimpl(rs))
+		fmt.Println()
 	}
 
 }
 
 func TestVerify(t *testing.T) {
-	g := NewGen("a*b|c")
+	g := NewGenSimpl("a*b|c")
 	err := g.Verify("c")
 	if err != nil {
 		t.Fatal(err)
