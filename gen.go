@@ -97,7 +97,7 @@ func (g *Gen) Verify(s string) error {
 	return nil
 }
 
-// Next generate a string that match the provided regexp, using the provide Chooser to make its choices.
+// Next generate a string that match the provided regexp, using the provided Chooser to make its choices.
 func (g *Gen) Next(it Chooser) string {
 	var b strings.Builder
 	next(&b, it, g.tree)
