@@ -93,13 +93,13 @@ func (g *Gen) Verify(s string) error {
 }
 
 // Next generate a new string that match the provided regexp.
-func (g *Gen) Next(it Inter) string {
+func (g *Gen) Next(it Chooser) string {
 	var b strings.Builder
 	next(&b, it, g.tree)
 	return b.String()
 }
 
-func next(b *strings.Builder, it Inter, re *syntax.Regexp) {
+func next(b *strings.Builder, it Chooser, re *syntax.Regexp) {
 
 	if re == nil {
 		return
