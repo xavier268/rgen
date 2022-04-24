@@ -2,7 +2,6 @@ package revregex
 
 import (
 	"fmt"
-	"math/rand"
 	"testing"
 )
 
@@ -82,8 +81,7 @@ func TestGenNext(t *testing.T) {
 		{"a{202,207}", 6},
 		{"a{2,200}", -1},
 	}
-	it := NewRandInter()
-	it.(*rand.Rand).Seed(4242) // fixed seed for reproductibility
+	it := NewRandChooserSeed(42)
 
 	const loop = 1000
 	for _, p := range pats {
