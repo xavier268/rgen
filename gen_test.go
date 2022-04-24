@@ -29,14 +29,14 @@ func TestGenStringVisual(t *testing.T) {
 	for i, rs := range tt {
 		// Display tree
 		fmt.Print(i, "\t")
-		g := New(rs)
+		g := NewGen(rs)
 		fmt.Println(g)
 	}
 
 }
 
 func TestVerify(t *testing.T) {
-	g := New("a*b|c")
+	g := NewGen("a*b|c")
 	err := g.Verify("c")
 	if err != nil {
 		t.Fatal(err)
@@ -68,6 +68,15 @@ func TestGenNext(t *testing.T) {
 		{"[[:punct:]]", 32},
 		{"[^a]", -1},
 		{".", -1},
+		{"a*", -1},
+		{"ab*", -1},
+		{"(ab)*", -1},
+		{"(a|b)*", -1},
+		{"[ab]*", -1},
+		{"[ab]+", -1},
+		{"a{2,7}", 6},
+		{"a{202,207}", 6},
+		{"a{2,200}", -1},
 	}
 	it := NewRandInter()
 	it.(*rand.Rand).Seed(4242) // fixed seed for reproductibility
@@ -76,7 +85,7 @@ func TestGenNext(t *testing.T) {
 	for _, p := range pats {
 		s := p.src
 		m := make(map[string]int, loop)
-		g := New(s)
+		g := NewGen(s)
 		fmt.Println(g)
 		for i := 0; i < loop; i++ {
 			ss := g.Next(it)
@@ -89,11 +98,11 @@ func TestGenNext(t *testing.T) {
 				t.Fatal(err)
 			}
 		}
-		i := 0
+		limit := 0
 		for k, v := range m {
-			i++
-			if i < 20 {
-				fmt.Printf("%3.1f%%\t%s\t%#v\n", 100*float64(v)/loop, k, []byte(k))
+			limit++
+			if limit < 20 {
+				fmt.Printf("%3.1f%%\t%s\t\t\t%#v\n", 100*float64(v)/loop, k, []byte(k))
 			} else {
 				fmt.Printf("[....]  truncating a total of %d values\n", len(m))
 				break

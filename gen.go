@@ -16,10 +16,13 @@ type Gen struct {
 	tree *syntax.Regexp
 }
 
-// New creates a new generator.
+// ShouldSimply is a global flag to decide if we should simplify or not when parsing a new expression.
+var ShouldSimplify = true
+
+// NewGen creates a new generator.
 // It will panic if the regexp provided is not syntacly correct.
 // Use POSIX syntax.
-func New(source string) *Gen {
+func NewGen(source string) *Gen {
 	var err error
 	g := new(Gen)
 	g.source = source
@@ -27,7 +30,9 @@ func New(source string) *Gen {
 	if err != nil {
 		panic(err)
 	}
-	g.tree = g.tree.Simplify()
+	if ShouldSimplify {
+		g.tree = g.tree.Simplify()
+	}
 	return g
 }
 
@@ -63,6 +68,8 @@ func toString(b *strings.Builder, re *syntax.Regexp) {
 	}
 }
 
+var ErrVerificationFailed = fmt.Errorf("verification failed")
+
 // Verify if a string match the regexp used to create g.
 func (g *Gen) Verify(s string) error {
 
@@ -72,7 +79,7 @@ func (g *Gen) Verify(s string) error {
 		return err
 	}
 	if !ok {
-		return fmt.Errorf("verification failed")
+		return ErrVerificationFailed
 	}
 	return nil
 }
@@ -125,9 +132,10 @@ func next(b *strings.Builder, it Inter, re *syntax.Regexp) {
 		}
 		fmt.Fprintf(b, "%c", rune(n))
 		return
-
 	case syntax.OpAnyChar: // matches any character
-		panic(re.Op.String() + " is not implemented")
+		n := uint(it.Intn('\U0010ffff'))
+		fmt.Fprintf(b, "%c", rune(n))
+		return
 	case syntax.OpBeginLine: // matches empty string at beginning of line
 		panic(re.Op.String() + " is not implemented")
 	case syntax.OpEndLine: // matches empty string at end of line
@@ -146,9 +154,19 @@ func next(b *strings.Builder, it Inter, re *syntax.Regexp) {
 		}
 		return
 	case syntax.OpStar: // matches Sub[0] zero or more times
-		panic(re.Op.String() + " is not implemented")
+		n := exp(it)
+		for i := 0; i < n; i++ {
+			for _, sub := range re.Sub { // the choice may differ between the repetitions !
+				next(b, it, sub)
+			}
+		}
 	case syntax.OpPlus: // matches Sub[0] one or more times
-		panic(re.Op.String() + " is not implemented")
+		n := exp(it) + 1
+		for i := 0; i < n; i++ {
+			for _, sub := range re.Sub { // the choice may differ between the repetitions !
+				next(b, it, sub)
+			}
+		}
 	case syntax.OpQuest: // matches Sub[0] zero or one times
 		if it.Intn(2) == 0 {
 			return
@@ -159,7 +177,12 @@ func next(b *strings.Builder, it Inter, re *syntax.Regexp) {
 			return
 		}
 	case syntax.OpRepeat: // matches Sub[0] at least Min times, at most Max (Max == -1 is no limit)
-		panic(re.Op.String() + " is not implemented")
+		n := re.Min + it.Intn(re.Max-re.Min+1)
+		for i := 0; i < n; i++ {
+			for _, sub := range re.Sub { // the choice may differ between the repetitions !
+				next(b, it, sub)
+			}
+		}
 	case syntax.OpConcat: // matches concatenation of Subs
 		for _, sub := range re.Sub {
 			next(b, it, sub)
