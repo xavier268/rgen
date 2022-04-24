@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+const VERSION = "0.1"
+
 // Gen can generate deterministic or random strings that match a given regexp.
 // Gen is thread safe.
 type Gen struct {

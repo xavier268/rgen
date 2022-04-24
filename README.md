@@ -21,15 +21,14 @@ import (
     // create a generator for this pattern
 	generator := NewGen(pattern)
     // create a source of entropy
-	entropy := NewRandInter() 
+	chooser := NewRandChooser() 
 
 	
-	// create a string matching the pattern
-	result := generator.Next(entropy)
+	// Now, you can ask the generator to create a string using the chooser to make its decisions.
+	result := generator.Next(chooser)
 		
-    // if you don't trust the package, you may verify the string actually matches.
-    // i you were able to create a string that does not verify, let me know, because it would be a bug.
-    err := generator.Verify(result)
+    // if you don't trust the package and want to verify that the string actually matches ...
+    err := generator.Verify(chooser)
     if err != nil {
         ...
     }
@@ -57,8 +56,8 @@ See refernce [here](https://golang.org/s/re2syntax)
 
 # Deterministic or random ?
 
-To choose which string to generate among the many, possibly unlimited possible strings matching the provided pattern, one needs to make choices.
-These choices are driven by anything that fullfil the Chooser interface.
+To choose which string to generate among the many - possibly unlimited - strings matching the provided pattern, one needs to make choices.
+These choices are driven by something that fullfils the Chooser interface.
 
 ```golang
 
