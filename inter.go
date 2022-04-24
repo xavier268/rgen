@@ -7,7 +7,7 @@ import (
 )
 
 type Inter interface {
-	// Intn provides a number between 0 and (n-)) included.
+	// Intn provides a number between 0 and (n-1) included.
 	Intn(n int) int
 }
 

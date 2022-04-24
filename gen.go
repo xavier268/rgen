@@ -2,25 +2,18 @@ package revregex
 
 import (
 	"fmt"
-	"math/big"
-	"math/rand"
+	"regexp"
 	"regexp/syntax"
 	"strings"
-	"time"
 )
 
-// Gen can efficiently and deterministically generate strings that match a given regexp.
+// Gen can generate deterministic or random strings that match a given regexp.
+// Gen is thread safe.
 type Gen struct {
 	// source string for the regexp.
 	source string
 	// root parsed tree
 	tree *syntax.Regexp
-	// random generator.
-	rand *rand.Rand
-	// max length when generating with * or + metasymbols. Has no impact on the actual length of the generated strings.
-	// set to 0 to disable * and +
-	// set to a negative value to have no formal limit, but an exponential law.
-	ml int
 }
 
 // New creates a new generator.
@@ -35,42 +28,21 @@ func New(source string) *Gen {
 		panic(err)
 	}
 	g.tree = g.tree.Simplify()
-	g.rand = rand.New(rand.NewSource(time.Hour.Milliseconds()))
-	g.ml = 6 // see if we want to keep this default value ?
 	return g
 }
 
-// Next provides a random string matching the regexp.
-func (g *Gen) Next() string {
-	panic("to do")
-}
-
-// NextI provides a determistic string matching the regexp.
-// i should be strictly positive.
-// The bigint returned it garanteed to be smaller or equal to the initial i value.
-func (g *Gen) NextI(i *big.Int) (string, *big.Int, error) {
-	panic("to do")
-}
-
-var ErrEntropyExhausted = fmt.Errorf("unsufficient entropy available")
-
-func Dump(s string) {
-
-	fmt.Printf("%q\n", s)
-	re, err := syntax.Parse(s, 0)
-	if err != nil {
-		panic(err)
-	}
+func (g *Gen) String() string {
 
 	var b strings.Builder
-	dump(&b, re.Simplify()) // use re.Simplify ?
-	fmt.Println(b.String())
 
-	fmt.Println("Freedom : ", freedom(re))
+	fmt.Fprintf(&b, "%q\t->\t", g.source)
+
+	toString(&b, g.tree)
+	return b.String()
 
 }
 
-func dump(b *strings.Builder, re *syntax.Regexp) {
+func toString(b *strings.Builder, re *syntax.Regexp) {
 	if re == nil {
 		fmt.Fprint(b, nil)
 		return
@@ -85,44 +57,120 @@ func dump(b *strings.Builder, re *syntax.Regexp) {
 
 		fmt.Fprint(b, re.Op, "(")
 		for _, rs := range re.Sub {
-			dump(b, rs)
+			toString(b, rs)
 		}
 		fmt.Fprint(b, ")")
 	}
 }
 
-// freedom degree of current tree
-// TODO - completer/verifier !!
-func freedom(re *syntax.Regexp) int64 {
+// Verify if a string match the regexp used to create g.
+func (g *Gen) Verify(s string) error {
+
+	ok, err := regexp.Match(g.source, []byte(s))
+
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return fmt.Errorf("verification failed")
+	}
+	return nil
+}
+
+// Next generate a new string that match the provided regexp.
+func (g *Gen) Next(it Inter) string {
+	var b strings.Builder
+	next(&b, it, g.tree)
+	return b.String()
+}
+
+func next(b *strings.Builder, it Inter, re *syntax.Regexp) {
 
 	if re == nil {
-		return 0
+		return
 	}
-	switch re.Op {
 
-	case syntax.OpAlternate:
-		return int64(len(re.Sub))
-	case syntax.OpQuest:
-		return 2 * freedom(re.Sub[0])
-	case syntax.OpCapture:
-		f := int64(1)
-		for _, rr := range re.Sub {
-			f *= freedom(rr)
-		}
-		return f
-	case syntax.OpConcat:
-		f := int64(1)
-		for _, rr := range re.Sub {
-			f *= freedom(rr)
-		}
-		return f
-	case syntax.OpCharClass:
-		var f int64
+	switch re.Op {
+	case syntax.OpNoMatch: // matches no strings
+		panic(re.Op.String() + " is not implemented")
+	case syntax.OpEmptyMatch: // matches empty string
+		return
+	case syntax.OpLiteral: // matches Runes sequence
+		fmt.Fprintf(b, "%s", string(re.Rune))
+		return
+	case syntax.OpCharClass: // matches Runes interpreted as range pair list
+		// count choices ?
+		nn := 0
 		for i := 0; i+1 < len(re.Rune); i += 2 {
-			f += int64(re.Rune[i+1]) - int64(re.Rune[i]) + 1
+			nn += int(re.Rune[i+1]-re.Rune[i]) + 1
 		}
-		return f
+		if nn == 0 {
+			return
+		}
+		n := it.Intn(nn)
+		for i := 0; i+1 < len(re.Rune); i += 2 {
+			if n < int(re.Rune[i+1]-re.Rune[i])+1 { // match this pair !
+				fmt.Fprintf(b, "%c", re.Rune[i]+rune(n))
+				return // done !
+			} else {
+				// adjust n and continue to next pair
+				n = n - (int(re.Rune[i+1]-re.Rune[i]) + 1)
+			}
+		}
+		panic("internal error OpCharClass")
+	case syntax.OpAnyCharNotNL: // matches any character except newline
+		n := uint(it.Intn('\U0010ffff' - 1))
+		if n == '\n' {
+			n++
+		}
+		fmt.Fprintf(b, "%c", rune(n))
+		return
+
+	case syntax.OpAnyChar: // matches any character
+		panic(re.Op.String() + " is not implemented")
+	case syntax.OpBeginLine: // matches empty string at beginning of line
+		panic(re.Op.String() + " is not implemented")
+	case syntax.OpEndLine: // matches empty string at end of line
+		panic(re.Op.String() + " is not implemented")
+	case syntax.OpBeginText: // matches empty string at beginning of text
+		panic(re.Op.String() + " is not implemented")
+	case syntax.OpEndText: // matches empty string at end of text
+		panic(re.Op.String() + " is not implemented")
+	case syntax.OpWordBoundary: // matches word boundary `\b`
+		panic(re.Op.String() + " is not implemented")
+	case syntax.OpNoWordBoundary: // matches word non-boundary `\B`
+		panic(re.Op.String() + " is not implemented")
+	case syntax.OpCapture: // capturing subexpression with index Cap, optional name Name
+		for _, sub := range re.Sub {
+			next(b, it, sub)
+		}
+		return
+	case syntax.OpStar: // matches Sub[0] zero or more times
+		panic(re.Op.String() + " is not implemented")
+	case syntax.OpPlus: // matches Sub[0] one or more times
+		panic(re.Op.String() + " is not implemented")
+	case syntax.OpQuest: // matches Sub[0] zero or one times
+		if it.Intn(2) == 0 {
+			return
+		} else {
+			for _, sub := range re.Sub {
+				next(b, it, sub)
+			}
+			return
+		}
+	case syntax.OpRepeat: // matches Sub[0] at least Min times, at most Max (Max == -1 is no limit)
+		panic(re.Op.String() + " is not implemented")
+	case syntax.OpConcat: // matches concatenation of Subs
+		for _, sub := range re.Sub {
+			next(b, it, sub)
+		}
+		return
+	case syntax.OpAlternate: // matches alternation of Subs
+		n := it.Intn(len(re.Sub))
+		next(b, it, re.Sub[n])
+		return
 	default:
-		return 1
+		panic("uniplemented regexp tree operation")
 	}
+
 }
