@@ -7,7 +7,10 @@ import (
 	"strings"
 )
 
-const VERSION = "0.1"
+const VERSION = "0.1.1"
+
+// MaxUnicode is the maximum Unicode character that can be generated.
+const MaxUnicode = '\U0010ffff'
 
 // Gen can generate deterministic or random strings that match a given regexp.
 // Gen is thread safe.
@@ -26,8 +29,8 @@ func NewGenSimpl(source string) *Gen {
 }
 
 // NewGen creates a new generator.
-// It will panic if the regexp provided is not syntacly correct.
-// Use POSIX syntax. No tree simplification.
+// It will panic if the regexp provided is not syntaxicaly correct.
+// Use POSIX syntax. No implicit parse tree simplification.
 func NewGen(source string) *Gen {
 	var err error
 	g := new(Gen)
@@ -94,7 +97,7 @@ func (g *Gen) Verify(s string) error {
 	return nil
 }
 
-// Next generate a new string that match the provided regexp.
+// Next generate a string that match the provided regexp, using the provide Chooser to make its choices.
 func (g *Gen) Next(it Chooser) string {
 	var b strings.Builder
 	next(&b, it, g.tree)
@@ -136,14 +139,14 @@ func next(b *strings.Builder, it Chooser, re *syntax.Regexp) {
 		}
 		panic("internal error OpCharClass")
 	case syntax.OpAnyCharNotNL: // matches any character except newline
-		n := uint(it.Intn('\U0010ffff' - 1))
+		n := uint(it.Intn(MaxUnicode - 1))
 		if n == '\n' {
 			n++
 		}
 		fmt.Fprintf(b, "%c", rune(n))
 		return
 	case syntax.OpAnyChar: // matches any character
-		n := uint(it.Intn('\U0010ffff'))
+		n := uint(it.Intn(MaxUnicode))
 		fmt.Fprintf(b, "%c", rune(n))
 		return
 	case syntax.OpBeginLine: // matches empty string at beginning of line
@@ -203,7 +206,7 @@ func next(b *strings.Builder, it Chooser, re *syntax.Regexp) {
 		next(b, it, re.Sub[n])
 		return
 	default:
-		panic("uniplemented regexp tree operation")
+		panic("uniplemented regexp parse tree operation")
 	}
 
 }

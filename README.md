@@ -52,7 +52,7 @@ They generate shorter strings first, giving an exponentially decreasing priority
 
 Beware of *negative* classes, such as [^a] or the dot "." operator, because they will likely generate a lot of strange unicode caracters ( up to 4 bytes characters ! ). Prefer to use *positive* classes such as [[:digit:]] or [a-zA-Z] to limit unprintable characters.
 
-See refernce [here](https://golang.org/s/re2syntax)
+See reference [here](https://golang.org/s/re2syntax)
 
 # Deterministic or random ?
 
