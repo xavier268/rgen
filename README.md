@@ -1,5 +1,9 @@
 # revregex
 
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/xavier268/revregex.svg)](https://pkg.go.dev/github.com/xavier268/revregex)
+
+
 A package you can use to generate all possible strings matching a given regular expression.
 
 
@@ -67,6 +71,6 @@ type Chooser interface {
 
 Two ways to construct an Inter are provided :
 
-* **NewRandChooserr** to make decision randomly. If you computer has a good random generator, you most likely will endup generating all the shorter possible strings.
+* **NewRandChooser** to make decision randomly. If you computer has a good random generator, you most likely will endup generating all the shorter possible strings.
 
 * **NewBytesChooser**, which takes a []byte as input, will use the *information* contained in this array to make its choices. There is a one-to-one relation between a given byte array and the sequence of strings generated. However, the information from the provided byte array is consumed as we generate strings and make choices, and, at some point, once there is no more information (underlying array is nil or contains only zeros), the defaults choices will always be made, generating from tat point always the same defaul answer. 
