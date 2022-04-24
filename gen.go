@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const VERSION = "0.1.1"
+const VERSION = "0.1.2"
 
 // MaxUnicode is the maximum Unicode character that can be generated.
 const MaxUnicode = '\U0010ffff'
@@ -206,7 +206,7 @@ func next(b *strings.Builder, it Chooser, re *syntax.Regexp) {
 		next(b, it, re.Sub[n])
 		return
 	default:
-		panic("uniplemented regexp parse tree operation")
+		panic("unimplemented regexp parse tree operation")
 	}
 
 }

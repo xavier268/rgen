@@ -25,7 +25,7 @@ import (
 
 	
 	// Now, you can ask the generator to create a string using the chooser to make its decisions.
-	result := generator.Next(chooser)
+	result := generator.Next(chooser) // for instance, result will get "aca" or "ab".
 		
     // if you don't trust the package and want to verify that the string actually matches ...
     err := generator.Verify(chooser)

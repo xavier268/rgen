@@ -17,7 +17,7 @@ import (
 // PASS
 // coverage: 81.1% of statements
 
-var result string // prevents compiler overoptimization ;-)
+var Result string // prevents compiler overoptimization ;-)
 
 func BenchmarkNextBoundedRaw(b *testing.B) {
 	s := "a*(b|c?d{2,5})e{1,10}"
@@ -27,7 +27,7 @@ func BenchmarkNextBoundedRaw(b *testing.B) {
 
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		result = g.Next(it)
+		Result = g.Next(it)
 	}
 
 }
@@ -40,7 +40,7 @@ func BenchmarkNextBoundedSimplified(b *testing.B) {
 
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		result = g.Next(it)
+		Result = g.Next(it)
 	}
 
 }
@@ -53,7 +53,7 @@ func BenchmarkNextUnboundedRaw(b *testing.B) {
 
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		result = g.Next(it)
+		Result = g.Next(it)
 	}
 }
 
@@ -65,6 +65,6 @@ func BenchmarkNextUnboundedSimplified(b *testing.B) {
 
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		result = g.Next(it)
+		Result = g.Next(it)
 	}
 }
