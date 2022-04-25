@@ -5,7 +5,10 @@ import "fmt"
 func ExampleNewGen() {
 
 	pattern := "a(b|c)a?"
-	generator := NewGen(pattern)
+	generator, err := NewGen(pattern)
+	if err != nil {
+		fmt.Println(err)
+	}
 	entropy := NewRandChooserSeed(42) // or use NewRandInter() for real randomness ...
 
 	// Generate 5 strings that match "a(b|c)a?"
@@ -14,7 +17,7 @@ func ExampleNewGen() {
 		fmt.Println(result)
 
 		// Verify each generated string actually matches ?
-		if err := generator.Verify(result); err != nil {
+		if err = generator.Verify(result); err != nil {
 			fmt.Println("Verification failed with error : ", err)
 		}
 	}

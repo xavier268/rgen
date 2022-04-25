@@ -18,7 +18,10 @@ import (
     // start from a POSIX regular expression pattern
     pattern := "a(b|c)a?"
     // create a generator for this pattern
-	generator := NewGen(pattern)
+	generator, err := NewGen(pattern)
+    if err != nil { 
+        ... 
+        }
     // create a source of entropy
 	chooser := NewRandChooser() 
 
@@ -27,10 +30,10 @@ import (
 	result := generator.Next(chooser) // for instance, result will get "aca" or "ab".
 		
     // if you don't trust the package and want to verify that the string actually matches ...
-    err := generator.Verify(chooser)
+    err = generator.Verify(chooser)
     if err != nil {
         ...
-    }
+        }
     
 
 ```

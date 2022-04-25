@@ -39,8 +39,11 @@ func TestGenStringVisual(t *testing.T) {
 }
 
 func TestVerify(t *testing.T) {
-	g := NewGenSimpl("a*b|c")
-	err := g.Verify("c")
+	g, err := NewGenSimpl("a*b|c")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = g.Verify("c")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -87,7 +90,10 @@ func TestGenNext(t *testing.T) {
 	for _, p := range pats {
 		s := p.src
 		m := make(map[string]int, loop)
-		g := NewGen(s)
+		g, err := NewGen(s)
+		if err != nil {
+			t.Fatal(err)
+		}
 		fmt.Println(g)
 		for i := 0; i < loop; i++ {
 			ss := g.Next(it)

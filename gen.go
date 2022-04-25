@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const VERSION = "0.1.3"
+const VERSION = "0.2.0"
 
 // MaxUnicode is the maximum Unicode character that can be generated.
 const MaxUnicode = '\U0010ffff'
@@ -22,24 +22,28 @@ type Gen struct {
 }
 
 // Same as NewGen, but in addition, the tree is simplified.
-func NewGenSimpl(source string) *Gen {
-	g := NewGen(source)
+func NewGenSimpl(source string) (*Gen, error) {
+	g, err := NewGen(source)
 	g.tree = g.tree.Simplify()
-	return g
+	return g, err
 }
 
 // NewGen creates a new generator.
-// It will panic if the regexp provided is not syntaxicaly correct.
+// It error if the regexp provided is not syntaxicaly correct.
 // Use POSIX syntax. No implicit parse tree simplification.
-func NewGen(source string) *Gen {
+func NewGen(source string) (*Gen, error) {
 	var err error
 	g := new(Gen)
-	g.source = source
-	g.tree, err = syntax.Parse(source, syntax.POSIX)
+	g.source = cleanPattern(source)
+	_, err = regexp.Compile(g.source)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return g
+	g.tree, err = syntax.Parse(g.source, syntax.POSIX)
+	if err != nil {
+		return nil, err
+	}
+	return g, nil
 }
 
 func (g *Gen) String() string {
@@ -118,7 +122,9 @@ func next(b *strings.Builder, it Chooser, re *syntax.Regexp) {
 		syntax.OpEndText,        // matches empty string at end of text
 		syntax.OpWordBoundary,   // matches word boundary `\b`
 		syntax.OpNoWordBoundary: // matches word non-boundary `\B`
-		panic(re.Op.String() + " is not implemented")
+		var bb strings.Builder
+		toString(&bb, re)
+		panic(re.Op.String() + " is not implemented in : " + bb.String())
 	case syntax.OpEmptyMatch: // matches empty string
 		return
 	case syntax.OpLiteral: // matches Runes sequence
@@ -204,4 +210,29 @@ func next(b *strings.Builder, it Chooser, re *syntax.Regexp) {
 		panic("unimplemented regexp parse tree operation")
 	}
 
+}
+
+// cleanPattern from valid but meaningless directives.
+func cleanPattern(pattern string) string {
+
+	for {
+		pat := pattern
+		pat = strings.ReplaceAll(pat, "^", "")
+		pat = strings.ReplaceAll(pat, "$", "")
+		pat = strings.ReplaceAll(pat, "\\A", "")
+		pat = strings.ReplaceAll(pat, "\\B", "")
+		pat = strings.ReplaceAll(pat, "\\a", "")
+		pat = strings.ReplaceAll(pat, "\\b", "")
+		pat = strings.ReplaceAll(pat, "\\z", "")
+		pat = strings.ReplaceAll(pat, "+?", "+")
+		pat = strings.ReplaceAll(pat, "*?", "*")
+		pat = strings.ReplaceAll(pat, "??", "?")
+		pat = strings.ReplaceAll(pat, "}?", "}")
+		pat = strings.ReplaceAll(pat, "**", "*")
+		pat = strings.ReplaceAll(pat, "+*", "+")
+		if pat == pattern {
+			return pat
+		}
+		pattern = pat
+	}
 }
