@@ -30,9 +30,9 @@ func TestGenStringVisual(t *testing.T) {
 	for i, rs := range tt {
 		// Display tree
 		fmt.Print(i, " raw  \t")
-		fmt.Println(NewGen(rs))
+		fmt.Println(Must(NewGen(rs)))
 		fmt.Print(i, " simpl\t")
-		fmt.Println(NewGenSimpl(rs))
+		fmt.Println(Must(NewGenSimpl(rs)))
 		fmt.Println()
 	}
 

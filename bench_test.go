@@ -4,6 +4,7 @@ import (
 	"testing"
 )
 
+// ==================================================================================================================
 // 2022-04-24 v0.1.3 : go test --bench=. --benchmem --cover
 //
 // goos: linux
@@ -17,6 +18,7 @@ import (
 // PASS
 // coverage: 81.1% of statements
 
+// ==================================================================================================================
 // 2022-04-25 v0.2.0 : go test --bench=. --benchmem --cover
 //
 // goos: linux
@@ -28,7 +30,7 @@ import (
 // BenchmarkNextUnboundedRaw-8              1828678               681.8 ns/op           138 B/op         11 allocs/op
 // BenchmarkNextUnboundedSimplified-8       1766050               664.1 ns/op           138 B/op         11 allocs/op
 // PASS
-// coverage: 86.7% of statements
+// coverage: 86.3% of statements
 
 var Result string // prevents compiler overoptimization ;-)
 

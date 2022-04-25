@@ -46,6 +46,16 @@ func NewGen(source string) (*Gen, error) {
 	return g, nil
 }
 
+// Must is a utilty to panic on error, when creating a Gen.
+// Typicla use is :
+// g := Must(NewGen(pattern))
+func Must(g *Gen, e error) *Gen {
+	if e != nil {
+		panic(e)
+	}
+	return g
+}
+
 func (g *Gen) String() string {
 
 	var b strings.Builder
