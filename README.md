@@ -47,7 +47,7 @@ Grouping or named captures have no effect.
 Word, line or text boundaries are meaningless here and should be avoided.
 
 Unbounded metacharacteres such as * or + are accepted. 
-They generate shorter strings first, giving an exponentially decreasing priority to the longuer strings.
+They generate shorter strings first, giving an exponentially decreasing priority to the longer strings.
 
 Beware of *negative* classes, such as [^a] or the dot "." operator, because they will likely generate a lot of strange unicode caracters ( up to 4 bytes characters ! ). Prefer to use *positive* classes such as [[:digit:]] or [a-zA-Z] to limit unprintable characters.
 
@@ -71,4 +71,4 @@ Two ways to construct a Chooser are provided :
 
 * **NewRandChooser** to make decision randomly. If you computer has a good random generator, you most likely will endup generating all the shorter possible strings.
 
-* **NewBytesChooser**, which takes a []byte as input, will use the *information* contained in this array to make its choices. There is a one-to-one relation between a given byte array and the sequence of strings generated. However, the information from the provided byte array is consumed as we generate strings and make choices, and, at some point, once there is no more information (underlying array is nil or contains only zeros), the defaults choices will always be made, generating from tat point always the same defaul answer. 
+* **NewBytesChooser**, which takes a []byte as input, will use the *information* contained in this array to make its choices. There is a one-to-one relation between a given byte array and the sequence of strings generated. However, the information from the provided byte array is consumed as we generate strings and make choices, and, at some point, once there is no more information (underlying array is nil or contains only zeros), the defaults choices will always be made, generating from that point always the same default answer. 

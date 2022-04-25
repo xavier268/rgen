@@ -25,13 +25,13 @@ func exp(it Chooser) (n int) {
 }
 
 // NewRandChooser uses random as the source for decision.
-// It is guaranteed that no string has a zero probability, but longuer strings have a much ower chance of appearing.
+// It is guaranteed that no string has a zero probability, but longer strings have a much lower chance of appearing.
 func NewRandChooser() Chooser {
 	return NewRandChooserSeed(time.Hour.Milliseconds())
 }
 
 // NewRandChooserSeed uses random as the source for decision.
-// It is guaranteed that no string has a zero probability, but longuer strings have a much ower chance of appearing.
+// It is guaranteed that no string has a zero probability, but longer strings have a much lower chance of appearing.
 // Setting the seed allows for reproductibility in tests.
 func NewRandChooserSeed(seed int64) Chooser {
 	return rand.New(rand.NewSource(seed))
