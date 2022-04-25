@@ -49,6 +49,8 @@ func FuzzPatterns(f *testing.F) {
 		"a|b",
 		"a*d+",
 		"^kjh$",
+		"a\nb",
+		"a\\nb",
 	}
 
 	for _, pat := range pats {
@@ -58,7 +60,7 @@ func FuzzPatterns(f *testing.F) {
 	ft := func(t *testing.T, pat string) {
 		gen, err := NewGen(pat)
 		if err != nil {
-			return // skip invalid patterns that are not recognized
+			return // SKIP invalid patterns that are not recognized
 		}
 		it := NewRandChooser()
 		s := gen.Next(it)
