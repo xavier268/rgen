@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const VERSION = "0.1.2"
+const VERSION = "0.1.3"
 
 // MaxUnicode is the maximum Unicode character that can be generated.
 const MaxUnicode = '\U0010ffff'
