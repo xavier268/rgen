@@ -1,9 +1,7 @@
 # revregex
 
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/xavier268/revregex.svg)](https://pkg.go.dev/github.com/xavier268/revregex)
-
-[![Go Report Card](https://goreportcard.com/badge/github.com/xavier268/revregex)](https://goreportcard.com/report/github.com/xavier268/revregex)
+[![Go Reference](https://pkg.go.dev/badge/github.com/xavier268/revregex.svg)](https://pkg.go.dev/github.com/xavier268/revregex) [![Go Report Card](https://goreportcard.com/badge/github.com/xavier268/revregex)](https://goreportcard.com/report/github.com/xavier268/revregex)
 
 A package you can use to generate all possible strings matching a given regular expression.
 
