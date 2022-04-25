@@ -111,7 +111,13 @@ func next(b *strings.Builder, it Chooser, re *syntax.Regexp) {
 	}
 
 	switch re.Op {
-	case syntax.OpNoMatch: // matches no strings
+	case syntax.OpNoMatch, // matches no strings
+		syntax.OpBeginLine,      // matches empty string at beginning of line
+		syntax.OpEndLine,        // matches empty string at end of line
+		syntax.OpBeginText,      // matches empty string at beginning of text
+		syntax.OpEndText,        // matches empty string at end of text
+		syntax.OpWordBoundary,   // matches word boundary `\b`
+		syntax.OpNoWordBoundary: // matches word non-boundary `\B`
 		panic(re.Op.String() + " is not implemented")
 	case syntax.OpEmptyMatch: // matches empty string
 		return
@@ -149,18 +155,7 @@ func next(b *strings.Builder, it Chooser, re *syntax.Regexp) {
 		n := uint(it.Intn(MaxUnicode))
 		fmt.Fprintf(b, "%c", rune(n))
 		return
-	case syntax.OpBeginLine: // matches empty string at beginning of line
-		panic(re.Op.String() + " is not implemented")
-	case syntax.OpEndLine: // matches empty string at end of line
-		panic(re.Op.String() + " is not implemented")
-	case syntax.OpBeginText: // matches empty string at beginning of text
-		panic(re.Op.String() + " is not implemented")
-	case syntax.OpEndText: // matches empty string at end of text
-		panic(re.Op.String() + " is not implemented")
-	case syntax.OpWordBoundary: // matches word boundary `\b`
-		panic(re.Op.String() + " is not implemented")
-	case syntax.OpNoWordBoundary: // matches word non-boundary `\B`
-		panic(re.Op.String() + " is not implemented")
+
 	case syntax.OpCapture: // capturing subexpression with index Cap, optional name Name
 		for _, sub := range re.Sub {
 			next(b, it, sub)
