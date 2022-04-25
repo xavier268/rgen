@@ -72,3 +72,9 @@ Two ways to construct a Chooser are provided :
 * **NewRandChooser** to make decision randomly. If you computer has a good random generator, you most likely will endup generating all the shorter possible strings.
 
 * **NewBytesChooser**, which takes a []byte as input, will use the *information* contained in this array to make its choices. There is a one-to-one relation between a given byte array and the sequence of strings generated. However, the information from the provided byte array is consumed as we generate strings and make choices, and, at some point, once there is no more information (underlying array is nil or contains only zeros), the defaults choices will always be made, generating from that point always the same default answer. 
+
+# Use for Fuzzing
+
+This can be useful for fuzzing if you want to fuzz a function whose argument matches a specific regex pattern. You could, of course, check if the pattern is matched when starting the test, and skip if not matching. However, even with medium complexity pattern, the likelyhood to find relevant pattern is very low, and the likelyhood to explore the pattern space is even lower.
+
+With this library, instead of fuzzing based on the function argument itself, you can fuzz an int64 that will be used as the random seed to generate a few strings matching the required pattern. The benefit is that you would explore the valid entry set more thoroughly, and faster. You could still, however, fuzz the direct way as well to check how your function behaves hen the input pattern is invalid.
