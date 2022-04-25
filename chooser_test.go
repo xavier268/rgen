@@ -35,7 +35,7 @@ func TestInterRandExpVisual(t *testing.T) {
 		n := exp(it)
 		m[n] += 1
 	}
-	fmt.Println("Value :  Frequence")
+	fmt.Println("Value :  Frequencies")
 	for i := 0; i < len(m); i++ {
 		freq := 100 * m[i] / float64(loop)
 		exp := 100. / math.Exp2(float64(i+1))

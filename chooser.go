@@ -25,13 +25,13 @@ func exp(it Chooser) (n int) {
 }
 
 // NewRandChooser uses random as the source for decision.
-// It is garanteed that no string has a zero probability, but longuer strings have a much ower chance of appearing.
+// It is guaranteed that no string has a zero probability, but longuer strings have a much ower chance of appearing.
 func NewRandChooser() Chooser {
 	return NewRandChooserSeed(time.Hour.Milliseconds())
 }
 
 // NewRandChooserSeed uses random as the source for decision.
-// It is garanteed that no string has a zero probability, but longuer strings have a much ower chance of appearing.
+// It is guaranteed that no string has a zero probability, but longuer strings have a much ower chance of appearing.
 // Setting the seed allows for reproductibility in tests.
 func NewRandChooserSeed(seed int64) Chooser {
 	return rand.New(rand.NewSource(seed))
@@ -39,7 +39,7 @@ func NewRandChooserSeed(seed int64) Chooser {
 
 // NewBytesChooser uses buf as a source of information for decision. This makes the exploration of all possible strings perfectily deterministic.
 // Using a chooser to make a decision "consumes" the available information.
-// When all information is "consumed", defaults or first choices will always be the one choosen.
+// When all information is "consumed", defaults or first choices will always be the one chosen.
 func NewBytesChooser(buf []byte) Chooser {
 	bb := new(bigChooser)
 	bb.big = big.NewInt(0)
