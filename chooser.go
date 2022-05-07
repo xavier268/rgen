@@ -27,7 +27,7 @@ func exp(it Chooser) (n int) {
 // NewRandChooser uses random as the source for decision.
 // It is guaranteed that no string has a zero probability, but longer strings have a much lower chance of appearing.
 func NewRandChooser() Chooser {
-	return NewRandChooserSeed(time.Hour.Milliseconds())
+	return NewRandChooserSeed(time.Now().UnixMilli())
 }
 
 // NewRandChooserSeed uses random as the source for decision.
