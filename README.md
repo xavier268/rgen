@@ -81,3 +81,13 @@ Two ways to construct a Chooser are provided :
 This can be useful for fuzzing if you want to fuzz a function whose argument matches a specific regex pattern. You could, of course, check if the pattern is matched when starting the test, and skip if not matching. However, even with medium complexity pattern, the likelyhood to find relevant pattern is very low, and the likelyhood to explore the pattern space is even lower.
 
 With this library, instead of fuzzing based on the function argument itself, you can fuzz an int64 that will be used as the random seed to generate a few strings matching the required pattern. The benefit is that you would explore the valid entry set more thoroughly, and faster. You could still, however, fuzz the direct way as well to check how your function behaves hen the input pattern is invalid.
+
+# Deduplicate generated strings
+
+The Deduper interface can be used to detect duplicated string. Querying for uniqueness will both register the string and return a uniqueness response. Querying twice will always return false ...
+
+It is currently available in two flavors :
+
+* **NewDedupMap** is based on a map[string]bool. Is is always exact, but the memory footprint is not bounded.
+* **NewDedupBloom** is a bloom-filter implementation. It has a bounded memory footprint and query time, but when a certain volume is reached, false positive (wrongly flaging original strings as duplicates) will start to occur. However, if a string is flaged as unique, it is really unique. 
+The default size for the bloom filter is a reasonable value up to a few hundred thousands different strings.
