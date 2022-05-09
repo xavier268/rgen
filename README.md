@@ -30,7 +30,7 @@ import (
 	result := generator.Next(chooser) // for instance, result will get "aca" or "ab".
 		
     // if you don't trust the package and want to verify that the string actually matches ...
-    err = generator.Verify(chooser)
+    err = generator.Verify(result)
     if err != nil {
         ...
         }

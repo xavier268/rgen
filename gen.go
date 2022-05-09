@@ -29,7 +29,7 @@ func NewGenSimpl(source string) (*Gen, error) {
 }
 
 // NewGen creates a new generator.
-// It error if the regexp provided is not syntaxicaly correct.
+// It returns an error if the regexp provided is not syntaxicaly correct.
 // Use POSIX syntax. No implicit parse tree simplification.
 func NewGen(source string) (*Gen, error) {
 	var err error
