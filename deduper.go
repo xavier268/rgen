@@ -14,7 +14,7 @@ type Deduper interface {
 // -------------------------------------
 
 // Creates a map-based Deduper.
-// Memory footprint will grow indefinitely, but respose is always exact.
+// Memory footprint will grow indefinitely, but response is always exact.
 func NewDedupMap() Deduper {
 	d := new(dedupmap)
 	d.m = make(map[string]bool, 10)
