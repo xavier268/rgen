@@ -1,3 +1,3 @@
 module github.com/xavier268/revregex
 
-go 1.18
+go 1.22
