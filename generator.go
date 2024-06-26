@@ -8,6 +8,8 @@ import (
 
 var ErrDone = fmt.Errorf("done")
 var ErrInvalidLength = fmt.Errorf("invalid length")
+var ErrEmptyConcat = fmt.Errorf("empty opConcat arguments")
+var ErrConcatFragments = fmt.Errorf("incompatible fragements, concatenation is forbidden") // when trying to cancatenate with start/end constraints
 
 var DEBUG = false
 
@@ -90,6 +92,29 @@ func newGenerator(ctx context.Context, re *syntax.Regexp, length int) (Generator
 	case syntax.OpCapture:
 		return newGenerator(ctx, re.Sub0[0], length)
 
+	case syntax.OpConcat:
+		if len(re.Sub) == 0 {
+			return nil, ErrEmptyConcat
+		}
+		if len(re.Sub) == 1 {
+			return newGenerator(ctx, re.Sub[0], length)
+		}
+
+		// here, we split between the first exp and the rest of the concat
+		rest := &syntax.Regexp{
+			Op:  syntax.OpConcat,
+			Sub: re.Sub[1:], // non empty, but could be only 1
+		}
+		g := &genConcat2{
+			ctx:  ctx,
+			sub1: re.Sub[0],
+			sub2: rest,
+		}
+		err := g.Reset(length)
+		if err != nil {
+			return nil, err
+		}
+		return g, ctx.Err()
 	default:
 		return nil, fmt.Errorf("unsupported op: %v", re.Op)
 	}
