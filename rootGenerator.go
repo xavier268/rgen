@@ -160,7 +160,27 @@ func newGenerator(ctx context.Context, re *syntax.Regexp, length int) (Generator
 		return g, g.ctx.Err()
 
 	case syntax.OpCharClass:
-		panic("not implemented")
+		g := &genCClass{
+			ctx:  ctx,
+			min:  []rune{},
+			max:  []rune{},
+			r:    0,
+			i:    0,
+			done: false,
+		}
+		if len(re.Rune) == 0 {
+			g.min = []rune{re.Rune0[0]}
+			g.max = []rune{re.Rune0[1]}
+		}
+		for i := 0; i < len(re.Rune); i += 2 {
+			g.min = append(g.min, re.Rune[i])
+			g.max = append(g.max, re.Rune[i+1])
+		}
+		err := g.Reset(length)
+		if err != nil {
+			return nil, err
+		}
+		return g, g.ctx.Err()
 
 	default:
 		return nil, fmt.Errorf("unsupported op: %v", re.Op)
