@@ -159,6 +159,9 @@ func newGenerator(ctx context.Context, re *syntax.Regexp, length int) (Generator
 		}
 		return g, g.ctx.Err()
 
+	case syntax.OpCharClass:
+		panic("not implemented")
+
 	default:
 		return nil, fmt.Errorf("unsupported op: %v", re.Op)
 	}

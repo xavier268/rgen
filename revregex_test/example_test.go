@@ -8,7 +8,7 @@ import (
 	"github.com/xavier268/revregex"
 )
 
-func ExampleNewGenerator_alternate_ex1() {
+func ExampleNewGenerator_alternate() {
 
 	do("(ab)|cde|f|gh", 6)
 
@@ -20,7 +20,7 @@ func ExampleNewGenerator_alternate_ex1() {
 	// (3) --> "cde"
 }
 
-func ExampleNewGenerator_concat_ex1() {
+func ExampleNewGenerator_concat() {
 
 	do("(ab)(xy)|cde|f(k)|(g|zt)h", 6)
 
@@ -33,7 +33,7 @@ func ExampleNewGenerator_concat_ex1() {
 	// (4) --> "abxy"
 }
 
-func ExampleNewGenerator_quest_ex1() {
+func ExampleNewGenerator_quest1() {
 	// revregex.DEBUG = true
 	do("ab?c", 6)
 
@@ -43,7 +43,7 @@ func ExampleNewGenerator_quest_ex1() {
 	// (3) --> "abc"
 }
 
-func ExampleNewGenerator_quest_ex2() {
+func ExampleNewGenerator_quest2() {
 	// revregex.DEBUG = true
 	do("a(b|ut)?c", 6)
 
@@ -54,7 +54,7 @@ func ExampleNewGenerator_quest_ex2() {
 	// (4) --> "autc"
 }
 
-func ExampleNewGenerator_star_ex1() {
+func ExampleNewGenerator_star1() {
 
 	do("ab*c", 6)
 
@@ -66,7 +66,7 @@ func ExampleNewGenerator_star_ex1() {
 	// (5) --> "abbbc"
 }
 
-func ExampleNewGenerator_star_ex2() {
+func ExampleNewGenerator_star2() {
 
 	do("a*b*c", 6)
 
@@ -89,7 +89,7 @@ func ExampleNewGenerator_star_ex2() {
 	// (5) --> "bbbbc"
 }
 
-func ExampleNewGenerator_star_ex3() {
+func ExampleNewGenerator_star3() {
 
 	do("a*b*", 3)
 
@@ -115,7 +115,7 @@ func ExampleNewGenerator_limitedRange() {
 	// (4) --> "aaaa"
 }
 
-func ExampleNewGenerator_plus_ex1() {
+func ExampleNewGenerator_plus1() {
 	do("a+", 4)
 
 	// Output:
@@ -125,7 +125,7 @@ func ExampleNewGenerator_plus_ex1() {
 	// (3) --> "aaa"
 }
 
-func ExampleNewGenerator_plus_ex2() {
+func ExampleNewGenerator_plus2() {
 	do("(a+)x(b*)", 5)
 
 	// Output:
