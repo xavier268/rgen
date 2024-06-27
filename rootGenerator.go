@@ -49,6 +49,8 @@ func NewGenerator(ctx context.Context, pattern string, length int) (Generator, e
 		ctx = context.Background()
 	}
 
+	re = re.Simplify()
+
 	return newGenerator(ctx, re, length)
 }
 

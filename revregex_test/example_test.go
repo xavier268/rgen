@@ -103,6 +103,17 @@ func ExampleNewGenerator_star_ex3() {
 
 }
 
+func ExampleNewGenerator_limitedRange() {
+	do("a{1,4}", 6)
+
+	// Output:
+	// Testing for pattern : a{1,4}
+	// (1) --> "a"
+	// (2) --> "aa"
+	// (3) --> "aaa"
+	// (4) --> "aaaa"
+}
+
 // =====================
 func do(patt string, n int) {
 	fmt.Printf("Testing for pattern : %s\n", patt)

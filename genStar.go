@@ -11,7 +11,7 @@ type genStar struct {
 	re  *syntax.Regexp
 	// state management
 	len       int
-	emptyDone bool      // used if len is 0, to remeber if 'nothing' was already sent.
+	emptyDone bool      // used if len is 0, to remember if 'nothing' was already sent.
 	gen       Generator // a single generator, constructed using the length n, using  x?x?x?... (n times)
 }
 
