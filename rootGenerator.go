@@ -53,7 +53,7 @@ func NewGenerator(ctx context.Context, pattern string, length int) (Generator, e
 }
 
 // newGenerator will create a generator from a regexp already compiled.
-// Generator is initialized.
+// Generator is already initialized.
 func newGenerator(ctx context.Context, re *syntax.Regexp, length int) (Generator, error) {
 
 	if DEBUG {
@@ -73,7 +73,7 @@ func newGenerator(ctx context.Context, re *syntax.Regexp, length int) (Generator
 	// select generator based on top op value
 	switch re.Op {
 
-	case syntax.OpLiteral:
+	case syntax.OpLiteral: // xyz
 		g := &genLiteral{
 			ctx: ctx,
 			s:   string(re.Rune),
@@ -81,7 +81,7 @@ func newGenerator(ctx context.Context, re *syntax.Regexp, length int) (Generator
 		err := g.Reset(length)
 		return g, err
 
-	case syntax.OpAlternate:
+	case syntax.OpAlternate: // a | b
 		g := &genAlternate{
 			ctx:  ctx,
 			subs: re.Sub,
@@ -89,10 +89,10 @@ func newGenerator(ctx context.Context, re *syntax.Regexp, length int) (Generator
 		err := g.Reset(length)
 		return g, err
 
-	case syntax.OpCapture:
+	case syntax.OpCapture: // (ab)
 		return newGenerator(ctx, re.Sub0[0], length)
 
-	case syntax.OpConcat:
+	case syntax.OpConcat: // (ab)(cd)
 		if len(re.Sub) == 0 {
 			return nil, ErrEmptyConcat
 		}
@@ -115,8 +115,50 @@ func newGenerator(ctx context.Context, re *syntax.Regexp, length int) (Generator
 			return nil, err
 		}
 		return g, ctx.Err()
+
+	case syntax.OpQuest: // (exp)?
+		g := &genQuest{
+			ctx:       ctx,
+			re:        re.Sub0[0],
+			len:       length,
+			emptyDone: false,
+			gen:       nil,
+		}
+		err := g.Reset(length)
+		if err != nil {
+			return nil, err
+		}
+		return g, g.ctx.Err()
+
+	case syntax.OpStar:
+		g := &genStar{
+			ctx: ctx,
+			re:  re.Sub0[0],
+			len: length,
+		}
+		err := g.Reset(length)
+		if err != nil {
+			return nil, err
+		}
+		return g, g.ctx.Err()
+
 	default:
 		return nil, fmt.Errorf("unsupported op: %v", re.Op)
 	}
 
+}
+
+func concatFrags(f1, f2 Fragment) (f3 Fragment, err error) {
+	f3 = Fragment{
+		s:     f1.s + f2.s,
+		start: f1.start,
+		end:   f2.end,
+	}
+	if f1.end && len(f2.s) > 0 {
+		return f3, ErrConcatFragments
+	}
+	if f2.start && len(f1.s) > 0 {
+		return f3, ErrConcatFragments
+	}
+	return f3, nil
 }

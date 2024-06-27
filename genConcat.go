@@ -106,18 +106,3 @@ func (g *genConcat2) incSplit() (err error) {
 	// return success
 	return g.ctx.Err()
 }
-
-func concatFrags(f1, f2 Fragment) (f3 Fragment, err error) {
-	f3 = Fragment{
-		s:     f1.s + f2.s,
-		start: f1.start,
-		end:   f2.end,
-	}
-	if f1.end && len(f2.s) > 0 {
-		return f3, ErrConcatFragments
-	}
-	if f2.start && len(f1.s) > 0 {
-		return f3, ErrConcatFragments
-	}
-	return f3, nil
-}
