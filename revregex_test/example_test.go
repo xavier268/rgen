@@ -3,6 +3,7 @@ package revregex_test
 import (
 	"context"
 	"fmt"
+	"regexp/syntax"
 
 	"github.com/xavier268/revregex"
 )
@@ -135,6 +136,26 @@ func ExampleNewGenerator_plus_ex2() {
 	// (4) --> "aaax"
 	// (4) --> "aaxb"
 	// (4) --> "axbb"
+}
+
+func ExampleNewGenerator_simplified_parsing() {
+	pats := []string{"a{1,5}", "a+", "a*", "a+a+", "a**", "a++"}
+	for _, s := range pats {
+		re, err := syntax.Parse(s, syntax.POSIX)
+		if err != nil {
+			panic(err)
+		}
+		res := re.Simplify()
+		fmt.Printf("%q --parse--> %q --simplify--> %q\n", s, re, res)
+	}
+
+	// Output:
+	// "a{1,5}" --parse--> "a{1,5}" --simplify--> "a(?:a(?:a(?:aa?)?)?)?"
+	// "a+" --parse--> "a+" --simplify--> "a+"
+	// "a*" --parse--> "a*" --simplify--> "a*"
+	// "a+a+" --parse--> "a+a+" --simplify--> "a+a+"
+	// "a**" --parse--> "(?:a*)*" --simplify--> "a*"
+	// "a++" --parse--> "(?:a+)+" --simplify--> "a+"
 }
 
 // =====================

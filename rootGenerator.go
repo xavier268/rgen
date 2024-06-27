@@ -51,6 +51,10 @@ func NewGenerator(ctx context.Context, pattern string, length int) (Generator, e
 
 	re = re.Simplify()
 
+	if DEBUG {
+		fmt.Printf("parsed simplified regexp : %s, length: %d\n", re.String(), length)
+	}
+
 	return newGenerator(ctx, re, length)
 }
 
