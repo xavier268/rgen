@@ -8,13 +8,13 @@ import (
 type genConcat2 struct {
 	// immutable
 	ctx  context.Context
-	sub1 *syntax.Regexp // the first expression, garanteed non nul
-	sub2 *syntax.Regexp // the second expression, garanteed non nul
-	// state management
+	sub1 *syntax.Regexp // the first expression, garanteed non nil
+	sub2 *syntax.Regexp // the second expression, garanteed non nil
+
+	// state management, use Reset to set initially
 	len1, len2 int       // both lengths, initially n,0
 	gen1, gen2 Generator // the generators, initially nil before reset
-	frag1      Fragment  // fragment already read from gen1
-	done       bool      // we are done, no more fragments will be generated !
+	frag1      *Fragment // fragment already read from gen1, nil if not read yet
 }
 
 var _ Generator = new(genConcat2)
@@ -24,9 +24,76 @@ func (g *genConcat2) Reset(exactLength int) (err error) {
 	if exactLength < 0 {
 		return ErrInvalidLength
 	}
-	// reset the lengths
-	g.len1, g.len2 = exactLength, 0
-	// Set the Generators
+
+	// reset the lengths and the generators
+	g.len1, g.len2 = exactLength+1, -1
+	err = g.incSplit()
+	if err != nil {
+		return err
+	}
+
+	// reset frag1
+	g.frag1 = nil
+
+	// all good
+	return g.ctx.Err()
+}
+
+// Next implements Generator.
+func (g *genConcat2) Next() (f Fragment, err error) {
+
+	// set frag1 if not set yet, set it
+	if g.frag1 == nil {
+		g.frag1 = &Fragment{}
+		*g.frag1, err = g.gen1.Next()
+		if err != nil {
+			// try to change split
+			err = g.incSplit()
+			if err != nil {
+				return Fragment{}, ErrDone
+			}
+			// iterate
+			return g.Next()
+		}
+	}
+
+	// generate frag2
+	f2, err := g.gen2.Next()
+	if err != nil {
+		// try to change split
+		err = g.incSplit()
+		if err != nil {
+			return Fragment{}, ErrDone
+		}
+		// iterate
+		return g.Next()
+	}
+
+	// try to concat f1 and f2
+	f, err = concatFrags(*g.frag1, f2)
+	if err != nil {
+		// ignore these fragments, iterate
+		return g.Next()
+	}
+
+	// success
+	return f, g.ctx.Err()
+
+}
+
+// increment split. Return error if no more split to try.
+func (g *genConcat2) incSplit() (err error) {
+	if g.len1 == 0 {
+		return ErrDone
+	}
+	// try with a new split
+	g.len1 = g.len1 - 1
+	g.len2 = g.len2 + 1
+
+	// reset frag1
+	g.frag1 = nil
+
+	// set the Generators
 	g.gen1, err = newGenerator(g.ctx, g.sub1, g.len1)
 	if err != nil {
 		return err
@@ -35,54 +102,9 @@ func (g *genConcat2) Reset(exactLength int) (err error) {
 	if err != nil {
 		return err
 	}
-	g.done = false
 
-	// Set frag1 to the first fragment of gen1
-	g.frag1, err = g.gen1.Next()
-	if err != nil {
-		// TODO - WRONG !!
-		g.done = true // nothing will be generated !
-	}
-
-	// all good
+	// return success
 	return g.ctx.Err()
-}
-
-// Next implements Generator.
-func (g *genConcat2) Next() (f Fragment, err error) {
-	if g.done {
-		return Fragment{}, ErrDone
-	}
-
-	frag2, err := g.gen2.Next()
-	if err == nil {
-		fr3, err := concatFrags(g.frag1, frag2)
-		if err == nil {
-			return fr3, nil
-		} else {
-			// concat error, try next value
-			return g.Next()
-		}
-	} else {
-		// no more gen2 frags, change frag1 and reset gen2
-		g.frag1, err = g.gen1.Next()
-		if err == nil {
-			g.gen2.Reset(g.len2)
-			return g.Next()
-		} else {
-			// no more gen1 frags, we need to change split
-			if g.len1 == 0 {
-				// we're done, no more split can be tried
-				return Fragment{}, ErrDone
-			}
-			// try with a new split
-			g.len1 = g.len1 - 1
-			g.len2 = g.len2 + 1
-
-		}
-	}
-
-	panic("TODO")
 }
 
 func concatFrags(f1, f2 Fragment) (f3 Fragment, err error) {

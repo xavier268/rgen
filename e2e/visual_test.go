@@ -12,7 +12,9 @@ func TestVisual(t *testing.T) {
 
 	revregex.DEBUG = false
 
-	patt := "(ab)|cde|f|gh"
+	patt := "(ab)(xy)|cde|f(k)|(g|zt)h"
+
+	fmt.Printf("Testing for pattern : %s\n", patt)
 
 	for i := 0; i < 5; i++ {
 		g, err := revregex.NewGenerator(context.Background(), patt, i)
@@ -20,7 +22,7 @@ func TestVisual(t *testing.T) {
 			t.Error(err)
 			return
 		}
-		fmt.Println("\n\n----", i, "----")
+		fmt.Println("----", i, "----")
 		//"----", i, "----")
 		//t.Log(g.String())"
 		for {

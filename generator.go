@@ -57,7 +57,7 @@ func NewGenerator(ctx context.Context, pattern string, length int) (Generator, e
 func newGenerator(ctx context.Context, re *syntax.Regexp, length int) (Generator, error) {
 
 	if DEBUG {
-		fmt.Printf("Compiled pattern=%s\n", re.String())
+		fmt.Printf("calling newGenerator: %s, length: %d\n", re.String(), length)
 	}
 
 	// check length

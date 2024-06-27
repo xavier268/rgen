@@ -2,7 +2,6 @@ package revregex
 
 import (
 	"context"
-	"fmt"
 )
 
 type genLiteral struct {
@@ -25,9 +24,7 @@ func (g *genLiteral) Next() (f Fragment, err error) {
 
 // Reset implements Generator.
 func (g *genLiteral) Reset(n int) error {
-	if DEBUG {
-		fmt.Printf("Literal=%s\n", string(g.s))
-	}
+
 	if n < 0 {
 		return ErrInvalidLength
 	}
