@@ -13,12 +13,12 @@ type genLiteral struct {
 var _ Generator = new(genLiteral)
 
 // Next implements Generator.
-func (g *genLiteral) Next() (f Fragment, err error) {
+func (g *genLiteral) Next() (f string, err error) {
 	if g.done {
-		return Fragment{}, ErrDone
+		return "", ErrDone
 	} else {
 		g.done = true
-		return Fragment{s: g.s}, g.ctx.Err()
+		return g.s, g.ctx.Err()
 	}
 }
 

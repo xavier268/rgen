@@ -14,7 +14,7 @@ type genConcat2 struct {
 	// state management, use Reset to set initially
 	len1, len2 int       // both lengths, initially n,0
 	gen1, gen2 Generator // the generators, initially nil before reset
-	frag1      *Fragment // fragment already read from gen1, nil if not read yet
+	frag1      *string   // fragment already read from gen1, nil if not read yet
 }
 
 var _ Generator = new(genConcat2)
@@ -40,17 +40,17 @@ func (g *genConcat2) Reset(exactLength int) (err error) {
 }
 
 // Next implements Generator.
-func (g *genConcat2) Next() (f Fragment, err error) {
+func (g *genConcat2) Next() (f string, err error) {
 
 	// set frag1 if not set yet, set it
 	if g.frag1 == nil {
-		g.frag1 = &Fragment{}
+		g.frag1 = new(string)
 		*g.frag1, err = g.gen1.Next()
 		if err != nil {
 			// try to change split
 			err = g.incSplit()
 			if err != nil {
-				return Fragment{}, ErrDone
+				return "", ErrDone
 			}
 			// iterate
 			return g.Next()
@@ -63,21 +63,14 @@ func (g *genConcat2) Next() (f Fragment, err error) {
 		// try to change split
 		err = g.incSplit()
 		if err != nil {
-			return Fragment{}, ErrDone
+			return "", ErrDone
 		}
 		// iterate
 		return g.Next()
 	}
 
-	// try to concat f1 and f2
-	f, err = concatFrags(*g.frag1, f2)
-	if err != nil {
-		// ignore these fragments, iterate
-		return g.Next()
-	}
-
-	// success
-	return f, g.ctx.Err()
+	// return concatenated frags
+	return *g.frag1 + f2, g.ctx.Err()
 
 }
 

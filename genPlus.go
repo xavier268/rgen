@@ -32,6 +32,6 @@ func (g *genPlus) Reset(exactLength int) (err error) {
 }
 
 // Next implements Generator.
-func (g *genPlus) Next() (f Fragment, err error) {
+func (g *genPlus) Next() (f string, err error) {
 	return g.gen.Next()
 }

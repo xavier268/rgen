@@ -51,15 +51,15 @@ func (g *genStar) Reset(len int) (err error) {
 
 }
 
-func (g *genStar) Next() (Fragment, error) {
+func (g *genStar) Next() (string, error) {
 
 	if g.len == 0 && !g.emptyDone {
 		g.emptyDone = true
-		return Fragment{}, g.ctx.Err()
+		return "", g.ctx.Err()
 	}
 
 	if g.len == 0 && g.emptyDone {
-		return Fragment{}, ErrDone
+		return "", ErrDone
 	}
 
 	return g.gen.Next()

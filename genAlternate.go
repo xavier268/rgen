@@ -29,16 +29,16 @@ func (g *genAlternate) Reset(exactLength int) error {
 }
 
 // Next implements Generator.
-func (g *genAlternate) Next() (f Fragment, err error) {
+func (g *genAlternate) Next() (f string, err error) {
 
 	if g.alt >= len(g.subs) {
-		return Fragment{}, ErrDone
+		return "", ErrDone
 	}
 
 	if g.gen == nil {
 		g.gen, err = newGenerator(g.ctx, g.subs[g.alt], g.len)
 		if err != nil {
-			return Fragment{}, err
+			return "", err
 		}
 	}
 

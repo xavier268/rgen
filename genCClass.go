@@ -22,9 +22,9 @@ func (g *genCClass) Reset(exactLength int) error {
 	return g.ctx.Err()
 }
 
-func (g *genCClass) Next() (f Fragment, err error) {
+func (g *genCClass) Next() (f string, err error) {
 	if g.done {
-		return Fragment{}, ErrDone
+		return "", ErrDone
 	}
 
 	// normalize pointers, error if cannot be normalized
@@ -34,12 +34,11 @@ func (g *genCClass) Next() (f Fragment, err error) {
 	}
 	if g.r >= len(g.min) {
 		g.done = true
-		return Fragment{}, ErrDone
+		return "", ErrDone
 	}
 
 	// fetch value currently pointed to by g.i,
-	f.s = string(g.min[g.r] + g.i)
-	f.start, f.end = false, false
+	f = string(g.min[g.r] + g.i)
 
 	// increment (but do not normalize yet)
 	g.i = g.i + 1

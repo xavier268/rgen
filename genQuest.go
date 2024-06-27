@@ -27,10 +27,10 @@ func (g *genQuest) Reset(exactLength int) (err error) {
 }
 
 // Next implements Generator.
-func (g *genQuest) Next() (f Fragment, err error) {
+func (g *genQuest) Next() (f string, err error) {
 	if !g.emptyDone && g.len == 0 {
 		g.emptyDone = true
-		return Fragment{}, g.ctx.Err()
+		return "", g.ctx.Err()
 	}
 	return g.gen.Next()
 }

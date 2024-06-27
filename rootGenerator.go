@@ -17,25 +17,7 @@ type Generator interface {
 	// reset the generator for given length
 	Reset(exactLength int) error
 	// retrieve next matching string
-	Next() (f Fragment, err error)
-}
-
-// Fragment are immutable
-type Fragment struct {
-	s     string // the string this fragment is based on
-	start bool   // no prior fragment allowed
-	end   bool   // no further fragment allowed
-}
-
-func (f Fragment) String() (s string) {
-	s = f.s
-	if f.start {
-		s = "^" + s
-	}
-	if f.end {
-		s = s + "$"
-	}
-	return s
+	Next() (f string, err error)
 }
 
 // Generator will produce all matching strings for given pattern and length.
@@ -186,19 +168,4 @@ func newGenerator(ctx context.Context, re *syntax.Regexp, length int) (Generator
 		return nil, fmt.Errorf("unsupported op: %v", re.Op)
 	}
 
-}
-
-func concatFrags(f1, f2 Fragment) (f3 Fragment, err error) {
-	f3 = Fragment{
-		s:     f1.s + f2.s,
-		start: f1.start,
-		end:   f2.end,
-	}
-	if f1.end && len(f2.s) > 0 {
-		return f3, ErrConcatFragments
-	}
-	if f2.start && len(f1.s) > 0 {
-		return f3, ErrConcatFragments
-	}
-	return f3, nil
 }
