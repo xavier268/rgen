@@ -114,6 +114,29 @@ func ExampleNewGenerator_limitedRange() {
 	// (4) --> "aaaa"
 }
 
+func ExampleNewGenerator_plus_ex1() {
+	do("a+", 4)
+
+	// Output:
+	// Testing for pattern : a+
+	// (1) --> "a"
+	// (2) --> "aa"
+	// (3) --> "aaa"
+}
+
+func ExampleNewGenerator_plus_ex2() {
+	do("(a+)x(b*)", 5)
+
+	// Output:
+	// Testing for pattern : (a+)x(b*)
+	// (2) --> "ax"
+	// (3) --> "aax"
+	// (3) --> "axb"
+	// (4) --> "aaax"
+	// (4) --> "aaxb"
+	// (4) --> "axbb"
+}
+
 // =====================
 func do(patt string, n int) {
 	fmt.Printf("Testing for pattern : %s\n", patt)

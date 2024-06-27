@@ -144,6 +144,17 @@ func newGenerator(ctx context.Context, re *syntax.Regexp, length int) (Generator
 		}
 		return g, g.ctx.Err()
 
+	case syntax.OpPlus:
+		g := &genPlus{
+			ctx: ctx,
+			re:  re.Sub0[0],
+		}
+		err := g.Reset(length)
+		if err != nil {
+			return nil, err
+		}
+		return g, g.ctx.Err()
+
 	default:
 		return nil, fmt.Errorf("unsupported op: %v", re.Op)
 	}
