@@ -32,12 +32,16 @@ func TestMain1(t *testing.T) {
 	// Report error, informing about timeout
 	fmt.Println(err, ", ", ctx.Err())
 
+	if ctx.Err() == nil {
+		t.Fatalf("Timeout should have occured")
+	}
+
 }
 
 func TestMain2(t *testing.T) {
 
-	// set timeout to 50 seconds
-	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Second)
+	// set timeout to 10 seconds
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	// create channel
@@ -80,4 +84,8 @@ func TestMain2(t *testing.T) {
 
 	// wait for both go routines to complete()  {
 	wg.Wait()
+
+	if ctx.Err() != nil {
+		t.Fatalf("should not time out : %v", ctx.Err())
+	}
 }
