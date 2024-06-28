@@ -40,7 +40,7 @@ func (g *genStar) Reset(len int) (err error) {
 		Op:  syntax.OpConcat,
 		Sub: subs,
 	}
-	// make generator for x?x?x? ...
+	// make generator for nt = x?x?x? ...
 	g.gen, err = newGenerator(g.ctx, nt, g.len)
 	if err != nil {
 		return err

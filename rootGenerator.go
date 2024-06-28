@@ -22,6 +22,8 @@ type Generator interface {
 
 // Generator will produce all matching strings for given pattern and length.
 // It will return error if pattern or length is invalid.
+// Even if generator will match nothing, there should not be an error.
+// Calling Next() will only return strings with the EXACT requiered length.
 func NewGenerator(ctx context.Context, pattern string, length int) (Generator, error) {
 	re, err := syntax.Parse(pattern, syntax.POSIX)
 	if err != nil {
@@ -168,4 +170,36 @@ func newGenerator(ctx context.Context, re *syntax.Regexp, length int) (Generator
 		return nil, fmt.Errorf("unsupported op: %v", re.Op)
 	}
 
+}
+
+// Function generate will generate strings matching the pattern, and send them to the provided channel.
+// The function will block until either all strings have been sent, or the context is cancelled.
+// It is the caller responsability to close the channel when the function returns.
+// All strings sent to channel will have the exact required length.
+func Generate(ctx context.Context, pattern string, length int, out chan<- string) error {
+	if out == nil {
+		return fmt.Errorf("nil channel")
+	}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	g, err := NewGenerator(ctx, pattern, length)
+	if err != nil {
+		return err
+	}
+	s := ""
+	for err == nil {
+		s, err = g.Next()
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			if err == nil {
+				out <- s
+			}
+		}
+		// loop until error becomes non nil
+	}
+
+	return ctx.Err()
 }

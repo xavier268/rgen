@@ -8,11 +8,11 @@ import (
 	"github.com/xavier268/revregex"
 )
 
-func ExampleNewGenerator_alternate() {
+func ExampleNewGenerator_alternate1() {
 
 	do("(ab)|cde|f|gh", 6)
 
-	// Output:
+	// Unordered output:
 	// Testing for pattern : "(ab)|cde|f|gh"
 	// (1) --> "f"
 	// (2) --> "ab"
@@ -20,11 +20,46 @@ func ExampleNewGenerator_alternate() {
 	// (3) --> "cde"
 }
 
-func ExampleNewGenerator_concat() {
+func ExampleNewGenerator_alternate2() {
+	// revregex.DEBUG = true
+	do("(a|b|c)(e|f|g)", 3)
+	// Unordered output:
+	// Testing for pattern : "(a|b|c)(e|f|g)"
+	// (2) --> "ae"
+	// (2) --> "af"
+	// (2) --> "ag"
+	// (2) --> "be"
+	// (2) --> "bf"
+	// (2) --> "bg"
+	// (2) --> "ce"
+	// (2) --> "cf"
+	// (2) --> "cg"
+}
+
+func ExampleNewGenerator_alternate3() {
+	// revregex.DEBUG = true
+	do("(a|bc|d|efg)", 5)
+	// Unordered output:
+	// Testing for pattern : "(a|bc|d|efg)"
+	// (1) --> "a"
+	// (1) --> "d"
+	// (2) --> "bc"
+	// (3) --> "efg"
+}
+
+func ExampleNewGenerator_concat1() {
+	do("(g|zt)h", 5)
+	// Unordered output:
+	// Testing for pattern : "(g|zt)h"
+	// (2) --> "gh"
+	// (3) --> "zth"
+
+}
+func ExampleNewGenerator_concat2() {
 
 	do("(ab)(xy)|cde|f(k)|(g|zt)h", 6)
 
-	// Output:
+	// Unordered output:
 	// Testing for pattern : "(ab)(xy)|cde|f(k)|(g|zt)h"
 	// (2) --> "fk"
 	// (2) --> "gh"
@@ -104,6 +139,19 @@ func ExampleNewGenerator_star3() {
 
 }
 
+func ExampleNewGenerator_star4() {
+	do("(a|b)*", 3)
+
+	// Output:
+	// Testing for pattern : "(a|b)*"
+	// (0) --> ""
+	// (1) --> "a"
+	// (1) --> "b"
+	// (2) --> "aa"
+	// (2) --> "ab"
+	// (2) --> "ba"
+}
+
 func ExampleNewGenerator_limitedRange() {
 	do("a{1,4}", 6)
 
@@ -176,8 +224,11 @@ func ExampleNewGenerator_class2() {
 	// (1) --> "\n"
 	// (1) --> "\r"
 }
-
 func ExampleNewGenerator_class3() {
+	do("[0-3]*", 4)
+	// Output:
+}
+func ExampleNewGenerator_class4() {
 	do("http(s)?://[0-9]{1,3}|(ab*a)", 15)
 
 	// Output:
