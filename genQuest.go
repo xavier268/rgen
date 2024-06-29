@@ -18,7 +18,7 @@ var _ Generator = new(genQuest)
 // Reset implements Generator.
 func (g *genQuest) Reset(exactLength int) (err error) {
 	g.len = exactLength
-	g.emptyDone = false
+	g.emptyDone = (exactLength != 0)
 	g.gen, err = newGenerator(g.ctx, g.re, g.len)
 	if err != nil {
 		return err
@@ -32,5 +32,6 @@ func (g *genQuest) Next() (f string, err error) {
 		g.emptyDone = true
 		return "", g.ctx.Err()
 	}
+
 	return g.gen.Next()
 }

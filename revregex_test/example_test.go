@@ -77,8 +77,24 @@ func ExampleNewGenerator_quest1() {
 	// (0) --> ""
 	// (1) --> "a"
 }
-
 func ExampleNewGenerator_quest2() {
+
+	do("a?b", 4)
+	// Output:
+	// Testing for pattern : "a?b"
+	// (1) --> "b"
+	// (2) --> "ab"
+}
+func ExampleNewGenerator_quest2b() {
+
+	do("ba?", 4)
+	// Output:
+	// Testing for pattern : "ba?"
+	// (1) --> "b"
+	// (2) --> "ba"
+}
+
+func ExampleNewGenerator_quest3() {
 	// revregex.DEBUG = true
 	do("ab?c", 6)
 
@@ -88,7 +104,7 @@ func ExampleNewGenerator_quest2() {
 	// (3) --> "abc"
 }
 
-func ExampleNewGenerator_quest3() {
+func ExampleNewGenerator_quest4() {
 	// revregex.DEBUG = true
 	do("a(b|ut)?c", 6)
 

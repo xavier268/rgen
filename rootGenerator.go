@@ -34,6 +34,7 @@ func NewGenerator(ctx context.Context, pattern string, length int) (Generator, e
 	}
 
 	re = re.Simplify()
+	re = preProcess(re)
 
 	if DEBUG {
 		fmt.Printf("parsed simplified regexp : %s, length: %d\n", re.String(), length)
@@ -84,21 +85,23 @@ func newGenerator(ctx context.Context, re *syntax.Regexp, length int) (Generator
 
 	case syntax.OpConcat: // (ab)(cd)
 		if len(re.Sub) == 0 {
-			return nil, ErrEmptyConcat
+			panic(ErrEmptyConcat) // should never happen
+			// return nil, ErrEmptyConcat
 		}
 		if len(re.Sub) == 1 {
 			return newGenerator(ctx, re.Sub[0], length)
 		}
 
-		// here, we split between the first exp and the rest of the concat
-		rest := &syntax.Regexp{
-			Op:  syntax.OpConcat,
-			Sub: re.Sub[1:], // non empty, but could be only 1
+		// there should be no more than 2 sugs, because of preprocessing !
+		if len(re.Sub) > 2 {
+			panic("unexpected concat with more than 2 arguments - should have been preprocessed")
 		}
+
+		// re.Sub[0] and re.Sub[1] are both empty
 		g := &genConcat2{
 			ctx:  ctx,
 			sub1: re.Sub[0],
-			sub2: rest,
+			sub2: re.Sub[1],
 		}
 		err := g.Reset(length)
 		if err != nil {
@@ -202,4 +205,36 @@ func Generate(ctx context.Context, pattern string, length int, out chan<- string
 	}
 
 	return ctx.Err()
+}
+
+// prePrecess the syntax tree : replace opConcat for multiple subs by a hierarchy of opConcat with excaly 2 subs.
+func preProcess(re *syntax.Regexp) *syntax.Regexp {
+	if re.Op == syntax.OpConcat {
+		switch {
+		case len(re.Sub) == 0:
+			panic("unexpected OpConcat without anay sub")
+		case len(re.Sub) == 1:
+			return preProcess(re.Sub[0])
+		case len(re.Sub) == 2:
+			return &syntax.Regexp{
+				Op: syntax.OpConcat,
+				Sub: []*syntax.Regexp{
+					preProcess(re.Sub[0]),
+					preProcess(re.Sub[1]),
+				},
+			}
+		case len(re.Sub) > 2:
+			return &syntax.Regexp{
+				Op: syntax.OpConcat,
+				Sub: []*syntax.Regexp{
+					preProcess(re.Sub[0]),
+					preProcess(&syntax.Regexp{
+						Op:  syntax.OpConcat,
+						Sub: re.Sub[1:],
+					}),
+				},
+			}
+		}
+	}
+	return re
 }
