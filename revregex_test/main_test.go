@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/xavier268/revregex"
+	revregex "github.com/xavier268/old"
 )
 
 func TestMain1(t *testing.T) {

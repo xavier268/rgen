@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"regexp/syntax"
 
-	"github.com/xavier268/revregex"
+	revregex "github.com/xavier268/old"
 )
 
 func ExampleNewGenerator_alternate1() {
