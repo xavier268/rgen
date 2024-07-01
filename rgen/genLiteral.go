@@ -20,6 +20,7 @@ func newGenLiteral(ctx context.Context, re *syntax.Regexp, max int) (Generator, 
 			ctx:  ctx,
 			max:  max,
 			gens: nil,
+			last: "",
 			done: false,
 		},
 		value: string(re.Rune),
@@ -28,12 +29,13 @@ func newGenLiteral(ctx context.Context, re *syntax.Regexp, max int) (Generator, 
 }
 
 // Next implements Generator.
-func (g *genLiteral) Next() (string, error) {
+func (g *genLiteral) Next() error {
 	if g.done {
-		return "", ErrDone
+		return ErrDone
 	}
 	g.done = true
-	return g.value, g.ctx.Err()
+	g.last = g.value
+	return g.ctx.Err()
 }
 
 // Reset implements Generator.

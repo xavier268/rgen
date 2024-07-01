@@ -7,7 +7,7 @@ import (
 
 type genAlternate struct {
 	*generator
-	alt int // pointer to the alternative being generated
+	alt int // pointer to the alternative that will be generated
 }
 
 var _ Generator = new(genAlternate)
@@ -18,6 +18,8 @@ func newGenAlternate(ctx context.Context, re *syntax.Regexp, max int) (Generator
 			ctx:  ctx,
 			max:  max,
 			gens: make([]Generator, len(re.Sub)),
+			last: "",
+			done: false,
 		},
 		alt: 0,
 	}
@@ -42,14 +44,20 @@ func (g *genAlternate) Reset(n int) error {
 	return g.generator.Reset(n)
 }
 
-func (g *genAlternate) Next() (string, error) {
-	if g.alt >= len(g.gens) {
-		return "", ErrDone
+func (g *genAlternate) Next() error {
+
+	if g.done {
+		return ErrDone
 	}
 
-	s, err := g.gens[g.alt].Next()
-	if err == nil {
-		return s, g.ctx.Err()
+	if g.alt >= len(g.gens) {
+		g.done = true
+		return ErrDone
+	}
+
+	if err := g.gens[g.alt].Next(); err == nil {
+		g.last = g.gens[g.alt].Last()
+		return g.ctx.Err()
 	}
 
 	// try next alternative

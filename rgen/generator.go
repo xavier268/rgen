@@ -16,10 +16,11 @@ type Generator interface {
 
 	// Generate nex string
 	// returns error if no more string available.
-	Next() (string, error)
+	Next() error
 
-	// return the children generators
-	Children() []Generator
+	// retrieve the last generated string.
+	// Undefined if called before Next() is called.
+	Last() string
 }
 
 // Compile a pattern into a new generator.
@@ -78,19 +79,19 @@ type generator struct {
 	ctx  context.Context
 	max  int
 	gens []Generator
+	last string
 	done bool
 }
 
 var _ Generator = new(generator)
 
-// Children implements Generator.
-func (g *generator) Children() []Generator {
-	return g.gens
+// Next implements Generator.
+func (g *generator) Next() error {
+	panic("unimplemented")
 }
 
-// Next implements Generator.
-func (g *generator) Next() (string, error) {
-	panic("unimplemented")
+func (g *generator) Last() string {
+	return g.last
 }
 
 // Reset implements Generator.
@@ -100,9 +101,10 @@ func (g *generator) Reset(length int) error {
 		return fmt.Errorf("length must be >= 0")
 	}
 	if length > g.max {
-		return fmt.Errorf("length must be <= %d", g.max)
+		return fmt.Errorf("length %d must be <= %d", length, g.max)
 	}
 	g.done = false
+	g.last = ""
 	for _, gen := range g.gens {
 		if g.ctx.Err() != nil {
 			return g.ctx.Err()
@@ -121,19 +123,18 @@ type genNoMatch struct{}
 
 var _ Generator = new(genNoMatch)
 
-// Children implements Generator.
-func (g *genNoMatch) Children() []Generator {
-	return nil
-}
-
 // Next implements Generator.
-func (g *genNoMatch) Next() (string, error) {
-	return "", ErrDone
+func (g *genNoMatch) Next() error {
+	return ErrDone
 }
 
 // Reset implements Generator.
 func (g *genNoMatch) Reset(length int) error {
 	return nil
+}
+
+func (g *genNoMatch) Last() string {
+	panic("last should never be called on genNoMatch")
 }
 
 // ======================================================================
@@ -145,18 +146,13 @@ type genEmptyMatch struct {
 
 var _ Generator = new(genEmptyMatch)
 
-// Children implements Generator.
-func (g *genEmptyMatch) Children() []Generator {
-	return nil
-}
-
 // Next implements Generator.
-func (g *genEmptyMatch) Next() (string, error) {
+func (g *genEmptyMatch) Next() error {
 	if g.done {
-		return "", ErrDone
+		return ErrDone
 	}
 	g.done = true
-	return "", nil
+	return nil
 }
 
 // Reset implements Generator.
@@ -164,3 +160,11 @@ func (g *genEmptyMatch) Reset(length int) error {
 	g.done = (length != 0)
 	return nil
 }
+
+func (g *genEmptyMatch) Last() string {
+	return ""
+}
+
+// ======================================================================
+
+// literal string

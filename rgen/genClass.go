@@ -53,17 +53,17 @@ func (g *genClass) Reset(n int) error {
 	return g.ctx.Err()
 }
 
-func (g *genClass) Next() (string, error) {
+func (g *genClass) Next() error {
 	if g.done {
-		return "", ErrDone
+		return ErrDone
 	}
 
 	if g.i >= len(g.values) {
 		g.done = true
-		return "", ErrDone
+		return ErrDone
 	}
 
-	s := string(g.values[g.i])
+	g.last = string(g.values[g.i])
 	g.i++
-	return s, g.ctx.Err()
+	return g.ctx.Err()
 }
