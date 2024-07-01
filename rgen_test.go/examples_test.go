@@ -103,6 +103,65 @@ func ExampleNewGenerator_quest2() {
 	// (1) --> "b"
 }
 
+func ExampleNewGenerator_quest3() {
+	do("[a-b]?", 3)
+
+	// Unordered output:
+	// Testing for pattern : "[a-b]?"
+	// (0) --> ""
+	// (1) --> "a"
+	// (1) --> "b"
+}
+
+func ExampleNewGenerator_concat1() {
+	do("[a-b]c", 3)
+
+	// Unordered output:
+	// Testing for pattern : "[a-b]c"
+	// (2) --> "ac"
+	// (2) --> "bc"
+
+}
+func ExampleNewGenerator_concat2() {
+	do("[a-b][c-d]", 3)
+
+	// Unordered output:
+	// Testing for pattern : "[a-b][c-d]"
+	// (2) --> "ac"
+	// (2) --> "bc"
+	// (2) --> "ad"
+	// (2) --> "bd"
+}
+
+func ExampleNewGenerator_concat3() {
+	do("a?c", 3)
+
+	// Unordered output:
+	// Testing for pattern : "a?c"
+	// (1) --> "c"
+	// (2) --> "ac"
+
+}
+func ExampleNewGenerator_concat4() {
+	do("(a|b)c", 3)
+
+	// Unordered output:
+	// Testing for pattern : "(a|b)c"
+	// (2) --> "ac"
+	// (2) --> "bc"
+
+}
+
+func ExampleNewGenerator_concat5() {
+	do("(a|bz)c", 3)
+
+	// Unordered output:
+	// Testing for pattern : "(a|bz)c"
+	// (2) --> "ac"
+	// (3) --> "bzc"
+
+}
+
 //========================================================================
 
 func do(patt string, n int) {
