@@ -66,6 +66,8 @@ func newGenerator(ctx context.Context, re *syntax.Regexp, max int) (Generator, e
 		return newGenQuest(ctx, re, max)
 	case syntax.OpConcat:
 		return newGenConcat(ctx, re, max)
+	case syntax.OpStar:
+		return newGenStar(ctx, re, max)
 	default:
 		panic(fmt.Sprintf("unknown operation : %d", re.Op))
 	}
