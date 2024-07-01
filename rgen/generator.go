@@ -6,7 +6,7 @@ import (
 	"regexp/syntax"
 )
 
-var ErrDone = fmt.Errorf("no more strings available")
+var ErrDone = fmt.Errorf("done")
 
 type Generator interface {
 
@@ -48,7 +48,6 @@ func NewGenerator(ctx context.Context, pattern string, max int) (Generator, erro
 func newGenerator(ctx context.Context, re *syntax.Regexp, max int) (Generator, error) {
 
 	re = re.Simplify()
-	re = processConcat(re)
 
 	switch re.Op {
 	case syntax.OpNoMatch:

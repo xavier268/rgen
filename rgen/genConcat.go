@@ -7,98 +7,94 @@ import (
 
 type genConcat struct {
 	*generator
-	frag0      *string // current first fragment, nil if not set
-	len0, len1 int     // both length, initially (n,0)
+	lens   []int // length expected from each of the generators
+	target int   // target length to generate
 }
 
 func newGenConcat(ctx context.Context, re *syntax.Regexp, max int) (Generator, error) {
-	if len(re.Sub) != 2 {
-		panic("concat expects exactly 2 arguments once preprocessed")
-	}
-	gen1, err := newGenerator(ctx, re.Sub[0], max)
-	if err != nil {
-		return nil, err
-	}
-	gen2, err := newGenerator(ctx, re.Sub[1], max)
-	if err != nil {
-		return nil, err
-	}
 
-	return &genConcat{
+	if re.Op != syntax.OpConcat {
+		panic("calling newGenConcat on an exprerssion that is not a concat op")
+	}
+	g := &genConcat{
 		generator: &generator{
 			ctx:  ctx,
 			max:  max,
-			gens: []Generator{gen1, gen2},
+			gens: make([]Generator, len(re.Sub)),
+			last: "",
 			done: false,
 		},
-		frag0: nil,
-		len0:  0,
-		len1:  0,
-	}, ctx.Err()
-
+		lens:   make([]int, len(re.Sub)),
+		target: 0,
+	}
+	for i, sub := range re.Sub {
+		var err error
+		g.gens[i], err = newGenerator(ctx, sub, max)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return g, ctx.Err()
 }
 
 func (g *genConcat) Reset(n int) error {
-	err := g.generator.Reset(n)
-	if err != nil {
-		return err
+	// reset lens and generators 0, 0, 0, 0, ...,n
+	for i, gen := range g.gens {
+		if i == len(g.lens)-1 {
+			g.lens[i] = n
+		} else {
+			g.lens[i] = 0
+		}
+		if err := gen.Reset(g.lens[i]); err != nil {
+			return err
+		}
 	}
-	g.len0, g.len1 = n, 0
-	g.frag0 = nil
+	g.target = n
+	g.done = false
+	g.last = ""
 	return g.ctx.Err()
 }
 
-func (g *genConcat) Next() (string, error) {
-
+func (g *genConcat) Next() error {
 	if g.done {
-		return "", ErrDone
+		return nil
 	}
+	// try to retrieve with existing split
 
-	if g.len0 < 0 {
-		g.done = true
-		return "", ErrDone
-	}
-
-	// TODO $$$$$$$$$$$$$$$$$$
-
-	// if frag0 is nil, try to set it and loop
-
-	// get next frag from gen2. If we could, fine, send result.
-
-	// If we cant, change split, reset generators, reset frag0 to nil, and loop
-
-	panic("todo")
+	return g.ctx.Err()
 }
 
-// ==================================================================
+// ========================================
 
-// replace abcd by a(b(c(d ...))) with always exctly 2 arguments to OpConcat.
-// called by newGenerator(...) for every regexp, before further processing.
-func processConcat(re *syntax.Regexp) *syntax.Regexp {
+func sum(ll []int) int {
+	sum := 0
+	for _, v := range ll {
+		sum += v
+	}
+	return sum
+}
 
-	if re.Op != syntax.OpConcat {
-		return re
+// increment a split for concat, starting from 0, 0, 0, ...., n
+// Sum of values should always stay the same.
+// all values are positive or 0.
+func incSplitConcat(ll []int) error {
+	if len(ll) <= 1 {
+		return ErrDone // nothing to split
+	}
+	lasti := len(ll) - 1 // last index
+
+	for i := 0; i < lasti; i++ {
+		if ll[lasti] > 0 {
+			ll[i]++
+			ll[lasti]--
+			return nil
+		} else {
+			// prepare to try next index ...
+			ll[lasti] = ll[lasti] + ll[i]
+			ll[i] = 0
+			continue
+		}
 	}
 
-	if len(re.Sub) == 0 {
-		panic("concat with 0 arguments")
-	}
-	if len(re.Sub) == 1 {
-		return re.Sub[0]
-	}
-	if len(re.Sub) == 2 {
-		return re // no change
-	}
-
-	// here, more than 2 args
-	return &syntax.Regexp{
-		Op: syntax.OpConcat,
-		Sub: []*syntax.Regexp{
-			re.Sub[0],
-			processConcat(&syntax.Regexp{
-				Op:  syntax.OpConcat,
-				Sub: re.Sub[1:],
-			}),
-		},
-	}
+	return ErrDone
 }

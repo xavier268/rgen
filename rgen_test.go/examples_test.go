@@ -121,11 +121,10 @@ func do(patt string, n int) {
 		}
 		// show all result strings
 		for {
-			f, err := g.Next()
-			if err != nil {
+			if err := g.Next(); err != nil {
 				break
 			}
-			fmt.Printf("(%d) --> %q\n", i, f)
+			fmt.Printf("(%d) --> %q\n", i, g.Last())
 		}
 	}
 }
