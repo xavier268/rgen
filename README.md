@@ -2,14 +2,15 @@ This package generate all the strings with a given length matching a provided re
 
 ## How to use 
 
-See [example](./revregex_test/main_test.go)
+See examples.
 
 ## Supported operations :
 
-* Parenthesis for grouping
+* Parenthesis for grouping, without capture
 * Zero-or-more(*)
 * One-or-more(+)
 * Zero-or-one (?)
+* Repeat {n,m}
 * Alternatives (|)
 * Concatenation
 * Character classes [a-z] or [abc] or [0-3 8-9]
