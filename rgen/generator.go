@@ -23,9 +23,10 @@ type Generator interface {
 	Last() string
 }
 
-// Compile a pattern into a new generator.
-// You must provide the maximum length for further resets.
-// The new generator is already reset.
+// Compile a pattern into a new Generator.
+// You must provide a maximum length (ie, capacity) for further resets.
+// The new generator has to be reset to the target length( less or equal to max)
+// before Next() can be called and Last() can be read.
 func NewGenerator(ctx context.Context, pattern string, max int) (Generator, error) {
 	if ctx == nil {
 		ctx = context.Background()
@@ -71,7 +72,7 @@ func newGenerator(ctx context.Context, re *syntax.Regexp, max int) (Generator, e
 	case syntax.OpPlus:
 		return newGenPlus(ctx, re, max)
 	default:
-		panic(fmt.Sprintf("unknown operation : %d", re.Op))
+		panic(fmt.Sprintf("opcode operation %d is not supported", re.Op))
 	}
 }
 
@@ -118,56 +119,3 @@ func (g *generator) Reset(length int) error {
 	}
 	return g.ctx.Err()
 }
-
-// ======================================================================
-
-// match nothing
-type genNoMatch struct{}
-
-var _ Generator = new(genNoMatch)
-
-// Next implements Generator.
-func (g *genNoMatch) Next() error {
-	return ErrDone
-}
-
-// Reset implements Generator.
-func (g *genNoMatch) Reset(length int) error {
-	return nil
-}
-
-func (g *genNoMatch) Last() string {
-	panic("last should never be called on genNoMatch")
-}
-
-// ======================================================================
-
-// only match ""
-type genEmptyMatch struct {
-	done bool
-}
-
-var _ Generator = new(genEmptyMatch)
-
-// Next implements Generator.
-func (g *genEmptyMatch) Next() error {
-	if g.done {
-		return ErrDone
-	}
-	g.done = true
-	return nil
-}
-
-// Reset implements Generator.
-func (g *genEmptyMatch) Reset(length int) error {
-	g.done = (length != 0)
-	return nil
-}
-
-func (g *genEmptyMatch) Last() string {
-	return ""
-}
-
-// ======================================================================
-
-// literal string

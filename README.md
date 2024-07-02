@@ -16,7 +16,7 @@ See examples.
 * Character classes [a-z] or [abc] or [0-3 8-9]
 
 The provided context allows for timeout and cancelation management.
-Operations are thread accross generators.
+Operations are threadsafe accross generators.
 
 ## Unsupported opérations :
 

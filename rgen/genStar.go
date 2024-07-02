@@ -131,6 +131,10 @@ func (g *genStar) doNext(i int) error {
 		}
 	}
 
+	if g.ctx.Err() != nil {
+		return g.ctx.Err()
+	}
+
 	// since we could not use i, try to increment i+1
 	return g.doNext(i + 1)
 }
@@ -160,6 +164,10 @@ func (g *genStar) useNewSplit() (err error) {
 
 	// here, we do not increment the split, but first try to use it.
 	for i := range g.lens {
+		if g.ctx.Err() != nil {
+			return g.ctx.Err()
+		}
+		// reset i
 		gen := g.gens[i]
 		if err := gen.Reset(g.lens[i]); err != nil {
 			g.splitok = true       // force incrementing split
@@ -190,24 +198,28 @@ func incSplitStar(s []int) ([]int, error) {
 
 	// on cherche le dernier nombre > 1
 	ttl := 0
+	rest := 0
 	last := -1
 	for i, v := range s {
-		ttl += v // calcul de la somme
+		ttl += v  // calcul de la somme
+		rest += v // calcul du rest
 		if v > 1 {
 			last = i // capture de last
+			rest = 0
 		}
 	}
+
 	if last == -1 {
 		return nil, ErrDone
 	}
 
 	// make a copy of s
-	res := make([]int, len(s))
+	res := make([]int, last+2)
 	copy(res, s)
 
 	// On decrement le [last], et on regroupe tout ce qui suit dans une seul nombre, pour garder le total inchangé.
 	res[last] = s[last] - 1
-	ss := append(res[:last+1], 1+sum(res[last+1:]))
+	ss := append(res[:last+1], rest+1)
 
 	//fmt.Println("DEBUG split : ", ss)
 	return ss, nil

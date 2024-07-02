@@ -286,6 +286,18 @@ func ExampleNewGenerator_plus1() {
 	// (4) --> "aaaa"
 }
 
+func ExampleNewGenerator_plus2() {
+	do("a+b+", 4)
+	// Unordered output:
+	// Testing for pattern : "a+b+"
+	// (2) --> "ab"
+	// (3) --> "abb"
+	// (3) --> "aab"
+	// (4) --> "abbb"
+	// (4) --> "aabb"
+	// (4) --> "aaab"
+}
+
 //========================================================================
 
 func do(patt string, n int) {

@@ -131,6 +131,10 @@ func (g *genConcat) doNext(i int) error {
 		}
 	}
 
+	if g.ctx.Err() != nil {
+		return g.ctx.Err()
+	}
+
 	// since we could not use i, try to increment i+1
 	return g.doNext(i + 1)
 }
@@ -149,6 +153,11 @@ func (g *genConcat) useNewSplit() error {
 	}
 	// here, we do not increment the split, but first try to use it.
 	for i, gen := range g.gens {
+
+		if g.ctx.Err() != nil {
+			return g.ctx.Err()
+		}
+
 		if err := gen.Reset(g.lens[i]); err != nil {
 			g.splitok = true       // force incrementing split
 			return g.useNewSplit() // cannot reset this generator - try another split
