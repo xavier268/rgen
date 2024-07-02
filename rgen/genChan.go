@@ -22,7 +22,7 @@ func Generate(ctx context.Context, ch chan<- string, pattern string, max int) er
 			if err != nil {
 				return
 			}
-			for err == nil {
+			for {
 				err = gen.Next()
 				if err != nil {
 					return

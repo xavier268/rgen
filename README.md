@@ -2,7 +2,7 @@ This package generate all the strings with a given length matching a provided re
 
 ## How to use 
 
-See examples.
+See examples & test files.
 
 ## Supported operations :
 
