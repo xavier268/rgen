@@ -42,6 +42,9 @@ func newGenConcat(ctx context.Context, re *syntax.Regexp, max int) (Generator, e
 
 // just the bare minimum. No string values are initialized.
 func (g *genConcat) Reset(n int) error {
+	if n < 0 {
+		panic("illegal negative length at reset")
+	}
 	// reset lens and generators 0, 0, 0, 0, ...,n
 	for i, gen := range g.gens {
 		if i == len(g.lens)-1 {

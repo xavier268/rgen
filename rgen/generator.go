@@ -41,13 +41,13 @@ func NewGenerator(ctx context.Context, pattern string, max int) (Generator, erro
 		return nil, err
 	}
 
+	re = re.Simplify()
+
 	return newGenerator(ctx, re, max)
 }
 
 // generic constructor from sub regex tree
 func newGenerator(ctx context.Context, re *syntax.Regexp, max int) (Generator, error) {
-
-	re = re.Simplify()
 
 	switch re.Op {
 	case syntax.OpNoMatch:
@@ -68,6 +68,8 @@ func newGenerator(ctx context.Context, re *syntax.Regexp, max int) (Generator, e
 		return newGenConcat(ctx, re, max)
 	case syntax.OpStar:
 		return newGenStar(ctx, re, max)
+	case syntax.OpPlus:
+		return newGenPlus(ctx, re, max)
 	default:
 		panic(fmt.Sprintf("unknown operation : %d", re.Op))
 	}

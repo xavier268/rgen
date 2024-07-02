@@ -22,7 +22,7 @@ func newGenStar(ctx context.Context, re *syntax.Regexp, max int) (Generator, err
 			last: "",
 			done: false,
 		},
-		lens:    make([]int, 0, max),
+		lens:    nil,
 		target:  0,
 		splitok: false,
 	}
@@ -39,20 +39,24 @@ func newGenStar(ctx context.Context, re *syntax.Regexp, max int) (Generator, err
 	return g, ctx.Err()
 }
 
+// Just bare minimum. No strings initialized.
+// lens starts with [n] or [].
+// Only corresponding generator is reset.
 func (g *genStar) Reset(n int) error {
-	for i := 0; i < g.target; i++ {
-		err := g.gens[i].Reset(g.lens[i])
-		if err != nil {
-			return err
-		}
+	if n < 0 {
+		panic("illegal negative length at reset")
+	}
+	// reset lens to [n]
+	if n > 0 {
+		g.lens = []int{n}
+		g.gens[0].Reset(n) // reset first generator
+	} else {
+		g.lens = nil
 	}
 	g.splitok = false
 	g.done = false
 	g.target = n
-	g.lens = append(g.lens[0:0], n) // [n] , with n!=0
-	if n >= 0 {
-		g.lens = nil // for n == 0	}
-	}
+	g.last = ""
 	return g.ctx.Err()
 }
 
@@ -60,20 +64,115 @@ func (g *genStar) Next() error {
 	if g.done {
 		return ErrDone
 	}
+	if g.target == 0 { // return "" only once
+		g.done = true
+		g.last = ""
+		return g.ctx.Err()
+	}
+
+	if !g.splitok {
+		if err := g.useNewSplit(); err != nil {
+			return err
+		}
+		g.splitok = true
+		g.setLast()
+		// fmt.Println("DEBUG split:", g.lens)
+		return g.ctx.Err()
+	}
+
+	// now, g.splitok = true
+	// here we already have an initialized split, with valid values.
+	// lets try to increment ?
+	err := g.doNext(0)
+	if err != nil {
+		// we could not increment, we need another split.
+		err := g.useNewSplit()
+		if err != nil {
+			return err
+		}
+		// ok - we have a new useable split.
+		g.setLast()
+		// fmt.Println("DEBUG split:", g.lens)
+		return g.ctx.Err()
+	}
+	// here, we could increment within the existing split.
+	// fmt.Println("DEBUG split:", g.lens)
 	g.setLast()
-	panic("not implemented")
+	return g.ctx.Err()
 }
 
 // =========== utilities ======================
+
+// try to execute next, or return error
+// this will never change the split.
+// It will only look at gens[i:].
+// g.last is not updated.
+// it assumes all first values of the split have been initialized.
+func (g *genStar) doNext(i int) error {
+
+	if i >= len(g.lens) {
+		return ErrDone
+	}
+
+	// try to use i
+	if g.gens[i].Next() == nil {
+		// success, return
+		return nil
+	} else {
+		// reset i
+		err := g.gens[i].Reset(g.lens[i])
+		if err != nil {
+			return err
+		}
+		// retrieve first value
+		err = g.gens[i].Next()
+		if err != nil {
+			return err
+		}
+	}
+
+	// since we could not use i, try to increment i+1
+	return g.doNext(i + 1)
+}
 
 // gather all max value as g.last.
 // All relevant value are required to be available and valid.
 func (g *genStar) setLast() {
 	buf := new(strings.Builder)
-	for i := 0; i < g.target; i++ {
+	for i := 0; i < len(g.lens); i++ {
 		buf.WriteString(g.gens[i].Last())
 	}
 	g.last = buf.String()
+}
+
+// loop until a new valild split can be found.
+// reset is then performed with this new split, and first values are initilized.
+// error means no further split will ever work.
+// if slitok is false, the current split is not changed, but just reset and initialized.
+func (g *genStar) useNewSplit() (err error) {
+	if g.splitok { // if current split was initialized, look for another one.
+		g.lens, err = incSplitStar(g.lens)
+		if err != nil {
+			// no more split to try
+			return ErrDone
+		}
+	}
+
+	// here, we do not increment the split, but first try to use it.
+	for i := range g.lens {
+		gen := g.gens[i]
+		if err := gen.Reset(g.lens[i]); err != nil {
+			g.splitok = true       // force incrementing split
+			return g.useNewSplit() // cannot reset this generator - try another split
+		}
+		if err := gen.Next(); err != nil {
+			g.splitok = true       // force incrementing split
+			return g.useNewSplit() // cannot initialize first value try another split
+		}
+	}
+	// all good
+	g.splitok = true
+	return g.ctx.Err()
 }
 
 // Genere tous les splits dont la somme est constante.
@@ -101,6 +200,7 @@ func incSplitStar(s []int) ([]int, error) {
 	if last == -1 {
 		return nil, ErrDone
 	}
+
 	// make a copy of s
 	res := make([]int, len(s))
 	copy(res, s)
@@ -109,5 +209,6 @@ func incSplitStar(s []int) ([]int, error) {
 	res[last] = s[last] - 1
 	ss := append(res[:last+1], 1+sum(res[last+1:]))
 
+	//fmt.Println("DEBUG split : ", ss)
 	return ss, nil
 }

@@ -214,6 +214,78 @@ func ExampleNewGenerator_concat6() {
 	// (3) --> "3by"
 }
 
+func ExampleNewGenerator_concat7() {
+	do("(a|cd|efg)", 5)
+	// Unordered output:
+	// Testing for pattern : "(a|cd|efg)"
+	// (1) --> "a"
+	// (2) --> "cd"
+	// (3) --> "efg"
+}
+
+func ExampleNewGenerator_star1() {
+	do("a*", 4)
+	// Unordered output:
+	// Testing for pattern : "a*"
+	// (0) --> ""
+	// (1) --> "a"
+	// (2) --> "aa"
+	// (3) --> "aaa"
+	// (4) --> "aaaa"
+}
+
+func ExampleNewGenerator_star2() {
+	do("a*b*", 4)
+	// Unordered output:
+	// Testing for pattern : "a*b*"
+	// (0) --> ""
+	// (1) --> "b"
+	// (1) --> "a"
+	// (2) --> "bb"
+	// (2) --> "ab"
+	// (2) --> "aa"
+	// (3) --> "bbb"
+	// (3) --> "abb"
+	// (3) --> "aab"
+	// (3) --> "aaa"
+	// (4) --> "bbbb"
+	// (4) --> "abbb"
+	// (4) --> "aabb"
+	// (4) --> "aaab"
+	// (4) --> "aaaa"
+}
+
+func ExampleNewGenerator_star3() {
+	do("(a|cd|efg)*", 4)
+	// Unordered output:
+	// Testing for pattern : "(a|cd|efg)*"
+	// (0) --> ""
+	// (1) --> "a"
+	// (2) --> "cd"
+	// (2) --> "aa"
+	// (3) --> "efg"
+	// (3) --> "cda"
+	// (3) --> "acd"
+	// (3) --> "aaa"
+	// (4) --> "efga"
+	// (4) --> "cdcd"
+	// (4) --> "cdaa"
+	// (4) --> "aefg"
+	// (4) --> "acda"
+	// (4) --> "aacd"
+	// (4) --> "aaaa"
+}
+
+func ExampleNewGenerator_plus1() {
+	do("a+", 4)
+	// Unordered output:
+	// Testing for pattern : "a+"
+	// (1) --> "a"
+	// (2) --> "aa"
+	// (3) --> "aaa"
+	// (4) --> "aaaa"
+}
+
 //========================================================================
 
 func do(patt string, n int) {
