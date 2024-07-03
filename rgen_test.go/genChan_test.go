@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/xavier268/revregex/rgen"
+	"github.com/xavier268/rgen"
 )
 
 func TestGenerate_long(t *testing.T) {
@@ -40,7 +40,7 @@ func ExampleGenerate_ex1() {
 // ==========================================================================================
 
 func dc(pat string, max int) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*1)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second/2)
 	defer cancel()
 
 	ch := make(chan string, 10)

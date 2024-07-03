@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/xavier268/revregex/rgen"
+	"github.com/xavier268/rgen"
 )
 
 func ExampleNewGenerator_alternate1() {
