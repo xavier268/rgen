@@ -6,7 +6,7 @@ import (
 )
 
 // Generate asynchroneously strings up to max length (included) and send them to the channel.
-// It is the callers responsability to read from, and close, the channel.
+// It is the callers responsibility to read from, and close, the channel.
 // The context error is returned, if context was canceled.
 func Generate(ctx context.Context, ch chan<- string, pattern string, max int) error {
 	wg := new(sync.WaitGroup)

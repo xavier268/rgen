@@ -13,7 +13,7 @@ type genLiteral struct {
 var _ Generator = new(genLiteral)
 
 // create a new genLiteral from a parse tree.
-// max specifiy the maximum length available for this generator.
+// max specify the maximum length available for this generator.
 func newGenLiteral(ctx context.Context, re *syntax.Regexp, max int) (Generator, error) {
 	g := &genLiteral{
 		generator: &generator{
