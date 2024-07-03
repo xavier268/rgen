@@ -6,6 +6,8 @@ import (
 
 func Example_incSplitConcat() {
 
+	// this is not an actual example, but an internal test.
+
 	lls := [][]int{
 		{0, 0, 4},
 		{0, 3},

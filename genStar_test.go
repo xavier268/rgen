@@ -3,6 +3,9 @@ package rgen
 import "fmt"
 
 func Example_incSplitStar() {
+
+	// this is not an actual example, but an internal test.
+
 	ss := [][]int{
 		{4},
 		{},

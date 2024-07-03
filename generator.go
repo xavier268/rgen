@@ -10,22 +10,25 @@ var ErrDone = fmt.Errorf("done")
 
 type Generator interface {
 
-	// error only on irrecoverable erorrs.
-	// never error if nothing can be generated.
+	// Sould be called before next is called.
+	// Error only on irrecoverable errors.
+	// Never error if nothing can be generated.
 	Reset(length int) error
 
-	// Generate nex string
-	// returns error if no more string available.
+	// Generate next string
+	// Returns error if no more string available.
 	Next() error
 
-	// retrieve the last generated string.
+	// Retrieve the last generated string.
+	// May be called multiple times, and will always
+	// return the same result until Next() is called again.
 	// Undefined if called before Next() is called.
 	Last() string
 }
 
 // Compile a pattern into a new Generator.
 // You must provide a maximum length (ie, capacity) for further resets.
-// The new generator has to be reset to the target length( less or equal to max)
+// The new generator has to be reset to the target length(less or equal to max)
 // before Next() can be called and Last() can be read.
 func NewGenerator(ctx context.Context, pattern string, max int) (Generator, error) {
 	if ctx == nil {
