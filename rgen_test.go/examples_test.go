@@ -1,7 +1,6 @@
 package rgen_test
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/xavier268/rgen"
@@ -300,26 +299,10 @@ func ExampleNewGenerator_plus2() {
 
 //========================================================================
 
-func do(patt string, n int) {
-	fmt.Printf("Testing for pattern : %q\n", patt)
+func do(pattern string, maxlen int) {
+	fmt.Printf("Testing for pattern : %q\n", pattern)
 
-	// set max length
-	g, err := rgen.NewGenerator(context.Background(), patt, n)
-	if err != nil {
-		panic(err)
-	}
-
-	// try successively all length
-	for i := 0; i <= n; i++ {
-		if err := g.Reset(i); err != nil {
-			panic(err)
-		}
-		// show all result strings
-		for {
-			if err := g.Next(); err != nil {
-				break
-			}
-			fmt.Printf("(%d) --> %q\n", i, g.Last())
-		}
+	for s := range rgen.All(pattern, maxlen) {
+		fmt.Printf("(%d) --> %q\n", len(s), s)
 	}
 }

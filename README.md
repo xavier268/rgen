@@ -5,13 +5,24 @@
 
 This package generate all the strings with a given length matching a provided regexp pattern.
 
-**Generate()** provides an asynchroneous generation model, with a channel.
+Three different API can used :
 
-**Generator** provides synchroneous generation model 
+
+
+  
+1. **All(regex string, maxlen int) iter.Seq[string]** provides a synchroneous iterator, compliant with the new go 1.23 syntax.
+   * This is the prefered method for synchroneous operation
+   * AllExact is a variant that iterate on strings with exactly the provided length
+  
+2. **Generator** provides detailled synchroneous generation model.
 * NewGenerator() creates a Generator
 * Reset(n int) defines the required length (exact)
 * Next() compute the next string
 * Last() retrieve the computed string.
+
+1. **Generate()** provides an asynchroneous generation model, with a channel.
+
+  
 
 ## How to use 
 

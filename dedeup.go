@@ -2,6 +2,7 @@ package rgen
 
 import (
 	"crypto/md5"
+	"iter"
 	"math/big"
 )
 
@@ -10,6 +11,22 @@ type Deduper interface {
 	// If Unique is true,  the string is garanteed to be seen for the first time.
 	// If Unique is false, the string was most probably already seen.
 	Unique(st string) bool
+}
+
+// Deduplicate the provided string iterator, using the provided Deduper.
+// Returns a new iterator, with all duplicates removed.
+// The order of the elements is guaranteed to math the initial iterator.
+func Dedup(it iter.Seq[string], d Deduper) iter.Seq[string] {
+
+	return func(yield func(string) bool) {
+		for st := range it {
+			if d.Unique(st) {
+				if !yield(st) {
+					return
+				}
+			} // else skip duplicates and iterate ...
+		}
+	}
 }
 
 // -------------------------------------
