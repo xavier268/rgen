@@ -13,10 +13,10 @@ Three different API can used :
    * The resulting iterator can be deduplicated, to generate only unique strings if the pattern is ambiguous (see Dedup and Deduper).
   
 2. **Generator** provides detailled synchroneous generation model.
-* NewGenerator() creates a Generator
-* Reset(n int) defines the required length (exact)
-* Next() compute the next string
-* Last() retrieve the computed string.
+   * NewGenerator() creates a Generator
+   * Reset(n int) defines the required length (exact)
+   * Next() compute the next string
+   * Last() retrieve the computed string.
 
 3. **Generate()** provides an asynchroneous generation model, with a channel.
 
