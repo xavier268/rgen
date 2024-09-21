@@ -1,9 +1,7 @@
-package rgen_test
+package rgen
 
 import (
 	"fmt"
-
-	"github.com/xavier268/rgen"
 )
 
 func ExampleAll() {
@@ -14,7 +12,7 @@ func ExampleAll() {
 	fmt.Println("Pattern:", pattern, "Max length: up to", maxlen, "(included)")
 
 	// Iterate over all strings generated from pattern up to maxlen length ...
-	for s := range rgen.All(pattern, maxlen) {
+	for s := range All(pattern, maxlen) {
 		fmt.Println(s)
 	}
 
@@ -77,7 +75,7 @@ func ExampleAllExact() {
 	fmt.Println("Pattern:", pattern, "Exact length:", exactlen)
 
 	// Iterate over all strings generated from pattern up to maxlen length ...
-	for s := range rgen.AllExact(pattern, exactlen) {
+	for s := range AllExact(pattern, exactlen) {
 		fmt.Println(s)
 	}
 
@@ -122,11 +120,11 @@ func ExampleDedup() {
 	// deduplicating using the provided map deduper.
 	// for s := range rgen.Dedup(rgen.AllExact(pattern, len), rgen.NewDedupMap()) {
 	fmt.Println("\nWithout Dedup")
-	for s := range rgen.AllExact(pattern, len) {
+	for s := range AllExact(pattern, len) {
 		fmt.Println(s)
 	}
 	fmt.Println("\nWith Dedup")
-	for s := range rgen.Dedup(rgen.AllExact(pattern, len), rgen.NewDedupMap()) {
+	for s := range Dedup(AllExact(pattern, len), NewDedupMap()) {
 		fmt.Println(s)
 	}
 
