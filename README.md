@@ -6,9 +6,6 @@
 This package generate all the strings with a given length matching a provided regexp pattern.
 
 Three different API can used :
-
-
-
   
 1. **All(regex string, maxlen int) iter.Seq[string]** provides a synchroneous iterator, compliant with the new go 1.23 syntax.
    * This is the prefered method for synchroneous operation
@@ -20,9 +17,9 @@ Three different API can used :
 * Next() compute the next string
 * Last() retrieve the computed string.
 
-1. **Generate()** provides an asynchroneous generation model, with a channel.
+3. **Generate()** provides an asynchroneous generation model, with a channel.
 
-  
+Some deduplication utilities are also provided, with both traditionnal API or an iterator API, see Dedup() and Deduper.
 
 ## How to use 
 
