@@ -10,6 +10,7 @@ Three different API can used :
 1. **All(regex string, maxlen int) iter.Seq[string]** provides a synchroneous iterator, compliant with the new go 1.23 syntax.
    * This is the prefered method for synchroneous operation
    * AllExact is a variant that iterate on strings with exactly the provided length
+   * The resulting iterator can be deduplicated, to generate only unique strings if the pattern is ambiguous (see Dedup and Deduper).
   
 2. **Generator** provides detailled synchroneous generation model.
 * NewGenerator() creates a Generator
@@ -19,7 +20,6 @@ Three different API can used :
 
 3. **Generate()** provides an asynchroneous generation model, with a channel.
 
-Some deduplication utilities are also provided, with both traditionnal API or an iterator API, see Dedup() and Deduper.
 
 ## How to use 
 
