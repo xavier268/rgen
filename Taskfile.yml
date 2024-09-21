@@ -1,0 +1,46 @@
+version: '3'
+
+env:
+  GOOS: # windows or linux ?
+    sh: go env GOOS
+  VERSION: # program version
+    sh: go run ./getversion/...
+  EXE: # executable extension (.exe or nothing)
+    sh: 'if [ "$(go env GOOS)" = "windows" ]; then echo ".exe"; else echo ""; fi'
+  BROWSER: # browser to open  page
+    sh: 'if [ "$(go env GOOS)" = "windows" ]; then echo "Powershell Start-Process "; else echo "xdg-open"; fi'
+
+
+tasks:
+
+  default:
+    desc: default task will display task menu (and update task itself)
+    cmds:
+      - go install github.com/go-task/task/v3/cmd/task@latest
+      - echo "default task will display task menu"
+      - task --list-all
+
+  version: 
+    desc: display versionning information
+    cmds:
+      - task --version
+      - echo rgen version':' {{.VERSION}}
+      - echo "shell :" $0 $SHELL
+      - go version
+
+  build: 
+    desc: build executable for current machine
+    cmds: 
+      - go build ./...
+
+  test:
+    desc: run all tests and examples
+    cmds:
+      - go test ./...
+
+  godoc: 
+    desc: launch godoc viewer and open browser page on windows
+    cmds:     
+      - go install golang.org/x/tools/cmd/godoc@latest 
+      - $( {{.BROWSER }} "http://localhost:6060" ) &
+      - godoc -http='localhost:6060'    

@@ -5,8 +5,8 @@ import (
 	"iter"
 )
 
-// All retuns an iterator over all available strings matching the provided regexp pattern,
-// whose lenght is less or equal to the specified maxlen length.
+// All returns an iterator over all available strings matching the provided regexp pattern,
+// whose lenghth is less or equal to the specified maxlen length.
 // No deduplication is performed, if multiple strings can be generated from different path with the same pattern.
 // Panic if pattern is not a valid regexp.
 func All(pattern string, maxlen int) iter.Seq[string] {

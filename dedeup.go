@@ -14,8 +14,8 @@ type Deduper interface {
 }
 
 // Deduplicate the provided string iterator, using the provided Deduper.
-// Returns a new iterator, with all duplicates removed.
-// The order of the elements is guaranteed to math the initial iterator.
+// Returns a new string iterator, with all duplicated strings skipped.
+// The order of the elements is guaranteed to match the initial iterator.
 func Dedup(it iter.Seq[string], d Deduper) iter.Seq[string] {
 
 	return func(yield func(string) bool) {
