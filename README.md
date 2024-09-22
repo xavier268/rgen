@@ -11,14 +11,8 @@ Three different API can used :
    * This is the prefered method for synchroneous operation
    * AllExact is a variant that iterate on strings with exactly the provided length
    * The resulting iterator can be deduplicated, to generate only unique strings if the pattern is ambiguous (see Dedup and Deduper).
-  
-2. **Generator** provides detailled synchroneous generation model.
-   * NewGenerator() creates a Generator
-   * Reset(n int) defines the required length (exact)
-   * Next() compute the next string
-   * Last() retrieve the computed string.
 
-3. **Generate()** provides an asynchroneous generation model, with a channel.
+2. **Generate()** provides an asynchroneous generation model, to a channel.
 
 
 ## How to use 
