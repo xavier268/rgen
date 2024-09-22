@@ -36,7 +36,17 @@ tasks:
   test:
     desc: run all tests and examples
     cmds:
-      - go test ./...
+      - go test -cover ./...
+
+  bench:
+    desc: run all benchmarks
+    cmds: 
+      - go test -bench=. -benchmem -cpu 2,8 ./...
+
+  clean:
+    desc: remove all build artifacts
+    cmds:
+      - go clean
 
   godoc: 
     desc: launch godoc viewer and open browser page on windows
