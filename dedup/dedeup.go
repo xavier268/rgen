@@ -1,4 +1,4 @@
-package rgen
+package dedup
 
 import (
 	"crypto/md5"
