@@ -1,4 +1,4 @@
-package rgen
+package rgen_test
 
 import (
 	"context"
@@ -9,6 +9,14 @@ import (
 
 	"github.com/xavier268/rgen"
 )
+
+func TestVersion(_ *testing.T) {
+	fmt.Println("=== Package information ===")
+	fmt.Println("rgen version:", rgen.VERSION)
+	fmt.Println("rgen build date:", rgen.BUILDDATE)
+	fmt.Println("Copyright:", rgen.COPYRIGHT)
+	fmt.Println(rgen.Licence())
+}
 
 func TestGenerate_long(t *testing.T) {
 	// using a very complex and large pattern, to test the context timout
