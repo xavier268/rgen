@@ -14,6 +14,7 @@ import (
 // whose lenghth is less or equal to the specified maxlen length.
 // No deduplication is performed, if multiple strings can be generated from different path with the same pattern.
 // Panic if pattern is not a valid regexp.
+// This API is the prefered API.
 func All(pattern string, maxlen int) iter.Seq[string] {
 
 	g, err := generator.NewGenerator(context.Background(), pattern, maxlen)
@@ -68,9 +69,12 @@ func AllExact(pattern string, exactlen int) iter.Seq[string] {
 // Generate asynchroneously strings up to max length (included) and send them to the channel.
 // It is the callers responsibility to read from, and close, the channel.
 // The context error is returned, if context was canceled.
+// Benchmarks are showing a somewhat limited benefit. Do not choose this API for performance reason, but rather
+// to be able to generate a mixture of short and long strings from a complex regexp, until you decide to stop
+// using the context.
 func Generate(ctx context.Context, ch chan<- string, pattern string, max int) error {
 	wg := new(sync.WaitGroup)
-	for i := 0; i <= max; i++ {
+	for i := 0; i <= max; i++ { // launch a generator for each length, in parallele.
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

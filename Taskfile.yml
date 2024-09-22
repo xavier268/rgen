@@ -39,9 +39,12 @@ tasks:
       - go test -cover ./...
 
   bench:
-    desc: run all benchmarks
+    desc: run all benchmarks (30 times)
     cmds: 
-      - go test -bench=. -benchmem -cpu 2,8 ./...
+      - go test -bench=. -benchmem -cpu 2,8 -cover ./...
+
+  run:
+    desc: run executable
 
   clean:
     desc: remove all build artifacts

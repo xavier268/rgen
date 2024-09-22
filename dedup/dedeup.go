@@ -1,3 +1,4 @@
+// deduplicate string values
 package dedup
 
 import (

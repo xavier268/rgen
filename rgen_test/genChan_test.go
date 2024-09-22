@@ -19,10 +19,12 @@ func TestVersion(_ *testing.T) {
 }
 
 func TestGenerate_long(t *testing.T) {
-	// using a very complex and large pattern, to test the context timout
+	// using a very complex and large pattern, to test the context timout and potential stack issues
 	err := dc("a*(c|de|fgh)*", 50)
 	if err == nil {
 		t.Error("context deadline expected, but did not occur")
+	} else {
+		fmt.Println("context deadline occurred as expected  ;-)")
 	}
 }
 
@@ -48,7 +50,7 @@ func ExampleGenerate_ex1() {
 // ==========================================================================================
 
 func dc(pat string, max int) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second/2)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*4)
 	defer cancel()
 
 	ch := make(chan string, 10)

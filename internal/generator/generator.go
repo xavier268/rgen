@@ -1,3 +1,4 @@
+// generator provides low level structures and functions used to efficiently generate strings from a regex pattern
 package generator
 
 import (
