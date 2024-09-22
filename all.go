@@ -3,6 +3,8 @@ package rgen
 import (
 	"context"
 	"iter"
+
+	"github.com/xavier268/rgen/internal/generator"
 )
 
 // All returns an iterator over all available strings matching the provided regexp pattern,
@@ -11,7 +13,7 @@ import (
 // Panic if pattern is not a valid regexp.
 func All(pattern string, maxlen int) iter.Seq[string] {
 
-	g, err := NewGenerator(context.Background(), pattern, maxlen)
+	g, err := generator.NewGenerator(context.Background(), pattern, maxlen)
 	if err != nil {
 		panic(err)
 	}
@@ -38,7 +40,7 @@ func All(pattern string, maxlen int) iter.Seq[string] {
 // Same as All, but the iterator will only generate strings with the provided exact length
 func AllExact(pattern string, exactlen int) iter.Seq[string] {
 
-	g, err := NewGenerator(context.Background(), pattern, exactlen)
+	g, err := generator.NewGenerator(context.Background(), pattern, exactlen)
 	if err != nil {
 		panic(err)
 	}

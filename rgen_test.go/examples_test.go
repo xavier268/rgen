@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/xavier268/rgen"
+	"github.com/xavier268/rgen/internal/generator"
 )
 
 func ExampleNewGenerator_alternate1() {
@@ -298,6 +299,9 @@ func ExampleNewGenerator_plus2() {
 }
 
 //========================================================================
+
+// keep compiler linter happy !
+var _ = generator.NewGenerator
 
 func do(pattern string, maxlen int) {
 	fmt.Printf("Testing for pattern : %q\n", pattern)

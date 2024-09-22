@@ -8,7 +8,7 @@ import (
 
 // Deduper is an object that can be used to deduplicate strings.
 type Deduper interface {
-	// If Unique is true,  the string is garanteed to be seen for the first time.
+	// If Unique is true,  the string is guaranteed to be seen for the first time.
 	// If Unique is false, the string was most probably already seen.
 	Unique(st string) bool
 }
@@ -33,7 +33,7 @@ func Dedup(it iter.Seq[string], d Deduper) iter.Seq[string] {
 
 // Creates a map-based Deduper.
 // Unique always provides an exact response.
-// Memory footprint will grow infinitely, but response is always exact.
+// Memory footprint will grow infinitely.
 // Avoid in production.
 func NewDedupMap() Deduper {
 	d := new(dedupmap)
@@ -58,8 +58,9 @@ func (d *dedupmap) Unique(st string) bool {
 
 // Creates a bloom-filter based Deduper.
 // Memory footprint is fixed, driven by bloomsize setting in bits.
-// True "Unique"" results are always right, but  after a while, False Unique could be wrong (appear as non unique, despite really being unique).
-// The larger the bloomsize, the lesser the error rate.
+// True "Unique"" results are always right, but  after a while,
+// False Unique could be wrong (will report as as non unique, despite really being unique).
+// The larger the bloomsize, the lesser the error rate. The bloomsize is specified as a number of bits.
 func NewDedupBloom(bloomsize int) Deduper {
 	d := new(dedupbloom)
 	d.z = big.NewInt(0)
@@ -73,7 +74,7 @@ type dedupbloom struct {
 }
 
 // Reasonable default value up to a few hundred thousands different strings (appx 33M bytes memory foot print)
-const DefaultBloomSize = 256 * 256 * 256 * 16 // total filter size
+const DefaultBloomSize = 256 * 256 * 256 * 16 // total filter size in bits
 
 func (d *dedupbloom) Unique(st string) bool {
 

@@ -3,6 +3,8 @@ package rgen
 import (
 	"context"
 	"sync"
+
+	"github.com/xavier268/rgen/internal/generator"
 )
 
 // Generate asynchroneously strings up to max length (included) and send them to the channel.
@@ -14,7 +16,7 @@ func Generate(ctx context.Context, ch chan<- string, pattern string, max int) er
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			gen, err := NewGenerator(ctx, pattern, i)
+			gen, err := generator.NewGenerator(ctx, pattern, i)
 			if err != nil {
 				return
 			}

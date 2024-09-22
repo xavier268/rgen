@@ -1,4 +1,4 @@
-package rgen
+package generator
 
 // match nothing
 type genNoMatch struct{}
