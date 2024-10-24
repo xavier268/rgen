@@ -4,6 +4,7 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/xavier268/rgen.svg)](https://pkg.go.dev/github.com/xavier268/rgen) [![Go Report Card](https://goreportcard.com/badge/github.com/xavier268/rgen)](https://goreportcard.com/report/github.com/xavier268/rgen)
 
 This package generate all the strings with a given length matching a provided regexp pattern.
+It parses and analyses the regex provided, and generate matching strings directly, significantly faster than the naive try-and-test approach.
 
 Three different API can used :
   
