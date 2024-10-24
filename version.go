@@ -1,4 +1,4 @@
-// rgen efficeintly generates all strings of certain length from a regex pattern
+// rgen efficiently generates all strings of certain length from a regex pattern
 package rgen
 
 import (
